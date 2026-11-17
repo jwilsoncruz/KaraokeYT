@@ -4,12 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Rockola Karaoke</title>
+<meta name="theme-color" content="#160c12">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='47' fill='%23160c12' stroke='%23e9b44c' stroke-width='6'/%3E%3Ccircle cx='50' cy='50' r='30' fill='none' stroke='%233d2431' stroke-width='3'/%3E%3Ccircle cx='50' cy='50' r='17' fill='%23ff3d6e'/%3E%3Ccircle cx='50' cy='50' r='4' fill='%23160c12'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#160c12;--panel:#24141d;--line:#3d2431;--tx:#f6ecd9;--mut:#b79fa9;--brass:#e9b44c;--neon:#ff3d6e;--ok:#4ad6a0;--on:#1a0f14;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f7efe0;--panel:#fffaf0;--line:#e3d3b8;--tx:#2a1620;--mut:#7a6068;--brass:#a8710a;--neon:#d41f55;--ok:#12805a;--on:#fff}}
 :root[data-theme="light"]{--bg:#f7efe0;--panel:#fffaf0;--line:#e3d3b8;--tx:#2a1620;--mut:#7a6068;--brass:#a8710a;--neon:#d41f55;--ok:#12805a;--on:#fff}
 *{box-sizing:border-box}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
@@ -23,7 +24,7 @@ input:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(-
 .btn.sm{padding:6px 10px;font-size:14px}.btn[disabled]{opacity:.5}
 .wrap{max-width:760px;margin:0 auto;padding:16px}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
-.row{display:flex;gap:10px;align-items:center}.grow{flex:1;min-width:0}
+.row{display:flex;gap:10px;align-items:center}.grow{flex:1 1 150px;min-width:0}
 .mut{color:var(--mut)}.small{font-size:14px}
 .stack>*+*{margin-top:10px}
 .song{display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
@@ -50,6 +51,40 @@ input:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(-
 .glow{color:var(--neon);text-shadow:0 0 18px color-mix(in srgb,var(--neon) 60%,transparent)}
 @media (max-width:820px){.tv{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+body{background:radial-gradient(1200px 600px at 15% -10%,#4a1030 0,transparent 60%),radial-gradient(900px 500px at 100% 10%,#1c2b5e 0,transparent 55%),var(--bg);background-attachment:fixed}
+body::before{content:"";position:fixed;inset:-20% -10% auto;height:75%;background:conic-gradient(from 200deg at 50% 0,transparent 0 20%,rgba(255,61,110,.2) 25%,transparent 30% 45%,rgba(233,180,76,.18) 50%,transparent 55% 70%,rgba(80,140,255,.18) 75%,transparent 80%);transform-origin:50% 0;animation:sweep 9s ease-in-out infinite alternate;pointer-events:none;z-index:0}
+#app{position:relative;z-index:1}
+@keyframes sweep{from{transform:rotate(-9deg)}to{transform:rotate(9deg)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.vinyl{animation:spin 6s linear infinite;flex:none;filter:drop-shadow(0 0 10px rgba(233,180,76,.5))}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.bar{background:linear-gradient(90deg,rgba(255,61,110,.14),rgba(233,180,76,.1));backdrop-filter:blur(8px)}
+.bar h1,.tv h1{background:linear-gradient(90deg,var(--brass),#fff3c4,var(--brass));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 12px rgba(233,180,76,.45))}
+.card{background:linear-gradient(160deg,color-mix(in srgb,var(--panel) 92%,transparent),color-mix(in srgb,var(--bg) 78%,transparent));box-shadow:0 10px 30px rgba(0,0,0,.28)}
+.btn{display:inline-flex;align-items:center;gap:6px;transition:transform .15s}.btn:active{transform:scale(.94)}
+.btn:not(.ghost):not(.neon){background:linear-gradient(135deg,#f7d27a,var(--brass))}
+.btn.neon{background:linear-gradient(135deg,var(--neon),#ff8a3d);box-shadow:0 0 18px rgba(255,61,110,.5)}
+.turn{display:flex;align-items:center;gap:10px;justify-content:center;padding:14px;margin-bottom:10px;border-radius:12px;font-weight:700;background:linear-gradient(135deg,var(--neon),#ff8a3d);color:#fff;animation:pulse 1.2s infinite}
+@keyframes pulse{50%{transform:scale(1.03);box-shadow:0 0 28px rgba(255,61,110,.7)}}
+.react{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;gap:4px;padding:8px 10px;border-radius:99px;background:color-mix(in srgb,var(--panel) 88%,transparent);backdrop-filter:blur(10px);border:1px solid var(--brass);box-shadow:0 8px 30px rgba(0,0,0,.45);z-index:5}
+.react button{background:none;border:0;font-size:28px;cursor:pointer;padding:2px 8px;transition:transform .12s}.react button:active{transform:scale(1.6)}
+.wrap{padding-bottom:96px}
+.eq{display:inline-flex;gap:3px;align-items:flex-end;height:18px;vertical-align:middle}.eq i{width:4px;background:var(--neon);border-radius:2px;animation:eq .9s ease-in-out infinite}
+.eq i:nth-child(2){animation-delay:.2s}.eq i:nth-child(3){animation-delay:.4s}.eq i:nth-child(4){animation-delay:.1s}
+@keyframes eq{0%,100%{height:4px}50%{height:18px}}
+.ann{position:fixed;inset:0;z-index:20;display:grid;place-items:center;text-align:center;padding:20px;background:radial-gradient(circle at 50% 40%,rgba(255,61,110,.55),rgba(10,3,8,.96) 70%);animation:annin .4s,annout .5s 3.3s forwards}
+.ann small{font-family:Bungee,sans-serif;letter-spacing:6px;color:#e9b44c;font-size:clamp(16px,3vw,36px)}
+.ann h2{font-size:clamp(44px,9vw,120px);line-height:1;margin:12px 0;background:linear-gradient(90deg,#fff,#e9b44c,#fff);-webkit-background-clip:text;background-clip:text;color:transparent;animation:zoom 3.8s ease-out}
+.ann p{font-size:clamp(18px,3vw,40px);color:#fff;margin:0}
+.conf i{position:fixed;top:-20px;width:10px;height:16px;z-index:21;animation:fall 3s linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+@keyframes zoom{from{transform:scale(.3);opacity:0}15%{transform:scale(1.08);opacity:1}to{transform:scale(1)}}
+@keyframes annin{from{opacity:0}}@keyframes annout{to{opacity:0;visibility:hidden}}
+.fl{position:fixed;bottom:-40px;z-index:15;font-size:clamp(34px,5vw,64px);text-align:center;animation:rise 3s ease-out forwards;pointer-events:none}
+.fl small{display:block;font:700 14px Outfit,sans-serif;color:#fff;text-shadow:0 1px 4px #000}
+@keyframes rise{to{transform:translateY(-80vh);opacity:0}}
+@media (prefers-reduced-motion:reduce){body::before,.vinyl,.eq i,.turn,.ann h2{animation:none!important}}
 </style>
 </head>
 <body>
@@ -58,7 +93,15 @@ input:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <script>
 const DEF={bar:'Rockola Karaoke',premium:true,price:5,max:3,pin:'1234',auto:true,mesas:12};
-const S={songs:[],queue:[],cfg:[]};
+const S={songs:[],queue:[],cfg:[],claps:[]};
+const P={mic:'<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4M8 22h8"/>',crown:'<path d="M2 7l5 5 5-8 5 8 5-5-2 12H4z"/>',note:'<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>'};
+const ic=(n,z)=>'<svg width="'+(z||20)+'" height="'+(z||20)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+P[n]+'</svg>';
+const vinyl=z=>'<svg class="vinyl" width="'+z+'" height="'+z+'" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="#0d0609" stroke="#e9b44c" stroke-width="2"/><circle cx="50" cy="50" r="40" fill="none" stroke="#3d2431"/><circle cx="50" cy="50" r="33" fill="none" stroke="#3d2431"/><circle cx="50" cy="50" r="26" fill="none" stroke="#3d2431"/><path d="M50 50L88 18A48 48 0 0 1 98 50z" fill="#fff" opacity=".07"/><circle cx="50" cy="50" r="16" fill="#ff3d6e"/><circle cx="50" cy="50" r="3" fill="#0d0609"/></svg>';
+let cc=0;
+function burst(k){const d=document.createElement('div');d.className='fl';d.style.left=(8+Math.random()*84)+'%';d.innerHTML=(k.e||'👏')+'<small>Mesa '+esc(k.mesa)+'</small>';document.body.appendChild(d);setTimeout(()=>d.remove(),3100);cc++;const el=$('#cc');if(el)el.textContent=cc+' aplausos'}
+function announce(n){const o=document.createElement('div');o.className='ann';o.innerHTML='<div><small>MESA '+esc(n.mesa)+' AL ESCENARIO</small><h2>'+esc(n.singer)+'</h2><p>'+ic('note',28)+' '+esc(n.title)+' · '+esc(n.artist)+'</p></div>';document.body.appendChild(o);
+ const col=['#ff3d6e','#e9b44c','#4ad6a0','#6aa8ff','#ffffff'],f=document.createElement('div');f.className='conf';f.innerHTML=Array.from({length:44},()=>'<i style="left:'+Math.random()*100+'%;background:'+col[Math.random()*5|0]+';animation-delay:'+(Math.random()*1.2).toFixed(2)+'s"></i>').join('');document.body.appendChild(f);setTimeout(()=>{o.remove();f.remove()},3900)}
+
 let store,user=null,view={upd(){}},isAdmin=false;
 const $=(s,r=document)=>r.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -80,7 +123,7 @@ function localStore(){const mem={},subs={};
  addEventListener('storage',e=>{if(e.key&&e.key.indexOf('rk_')===0){const n=e.key.slice(3);load(n);emit(n)}});
  return{mode:'local',sub(n,f){load(n);(subs[n]=subs[n]||[]).push(f);f(rows(n))},
   set(n,id,d){load(n);mem[n][id]=d;save(n);emit(n)},del(n,id){load(n);delete mem[n][id];save(n);emit(n)}}}
-const FB={apiKey:"PEGA_AQUI",authDomain:"PEGA_AQUI",projectId:"PEGA_AQUI",storageBucket:"PEGA_AQUI",messagingSenderId:"PEGA_AQUI",appId:"PEGA_AQUI"};
+const FB={apiKey:"AIzaSyD1Xpv_gCCY0LXRoyC7r_veJYmQqVhRlcU",authDomain:"rockolaqr.firebaseapp.com",projectId:"rockolaqr",storageBucket:"rockolaqr.firebasestorage.app",messagingSenderId:"48675212571",appId:"1:48675212571:web:9b2f0e902cdb196b6597be"};
 async function fireStore(){
  const A=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
  const F=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
@@ -99,11 +142,11 @@ function request(song,mesa,singer,prio){
 function next(){const n=nowP();if(n)upd(n,{status:'done',doneAt:Date.now()});const w=waiting()[0];if(w)upd(w,{status:'now',startAt:Date.now()})}
 function qrSvg(t){try{const q=qrcode(0,'M');q.addData(t);q.make();return q.createSvgTag(4,2)}catch(e){return '<p class="small mut">'+esc(t)+'</p>'}}
 const base=()=>location.href.split('#')[0];
-const head=(t,extra)=>'<div class="bar"><h1>'+esc(t)+'</h1><div>'+(extra||'')+'</div></div>';
+const head=(t,extra)=>'<div class="bar"><div class="brand">'+vinyl(36)+'<h1>'+esc(t)+'</h1></div><div>'+(extra||'')+'</div></div>';
 
 /* ---------- inicio ---------- */
 function home(){const A=$('#app');
- A.innerHTML=head(cfg().bar)+'<div class="wrap"><p class="mut">Elige cómo quieres abrir la rockola en este dispositivo.</p><div class="home">'+
+ A.innerHTML=head(cfg().bar)+'<div class="wrap" style="text-align:center">'+vinyl(120)+'<p class="mut">Elige cómo quieres abrir la rockola en este dispositivo.</p><div class="home">'+
  '<a class="card" href="#pantalla"><h3>Pantalla principal</h3><p class="mut small">Para el televisor o proyector: video, turno actual y próximos cantantes.</p></a>'+
  '<a class="card" href="#panel"><h3>Panel de control</h3><p class="mut small">Cola, catálogo, QR de mesas, prioridad premium y ajustes.</p></a>'+
  '<div class="card"><h3>Pedir desde una mesa</h3><div class="row" style="margin-top:10px"><input id="mn" type="number" min="1" placeholder="Número de mesa" aria-label="Número de mesa"><button class="btn" id="go">Entrar</button></div></div></div>'+
@@ -117,7 +160,8 @@ function mesa(n){const A=$('#app');let q='',art='';
  A.innerHTML=head(cfg().bar,'<span class="tag p">Mesa '+n+'</span>')+'<div class="wrap stack">'+
  '<div class="card stack"><input id="nm" placeholder="Tu nombre (para llamarte al escenario)" value="'+esc(nm)+'" maxlength="30" aria-label="Tu nombre">'+
  '<input id="sq" type="search" placeholder="Buscar canción o intérprete" aria-label="Buscar"></div>'+
- '<div class="chips" id="ch"></div><div class="card" id="sl"></div><div class="card" id="my"></div></div>';
+ '<div class="chips" id="ch"></div><div class="card" id="sl"></div><div class="card" id="my"></div></div><div class="react" id="rx">'+['👏','🔥','❤️','🎉'].map(e=>'<button data-e="'+e+'" aria-label="Reaccionar '+e+'">'+e+'</button>').join('')+'</div>';
+ let lr=0;$('#rx').onclick=e=>{const b=e.target.closest('[data-e]');if(!b||Date.now()-lr<600)return;lr=Date.now();store.set('claps',uid('c'),{mesa:n,e:b.dataset.e,ts:Date.now()});try{navigator.vibrate&&navigator.vibrate(20)}catch(x){}};
  $('#nm').oninput=e=>{try{localStorage.setItem('rk_name',e.target.value)}catch(x){}};
  $('#sq').oninput=e=>{q=e.target.value.toLowerCase();draw()};
  $('#ch').onclick=e=>{const c=e.target.closest('[data-a]');if(c){art=c.dataset.a;chips();draw()}};
@@ -125,27 +169,30 @@ function mesa(n){const A=$('#app');let q='',art='';
  function chips(){const a=[...new Set(S.songs.map(s=>s.artist))].sort();$('#ch').innerHTML=['Todos',...a].map(x=>'<button class="chip'+((x==='Todos'?'':x)===art?' on':'')+'" data-a="'+(x==='Todos'?'':esc(x))+'">'+esc(x)+'</button>').join('')}
  function draw(){const c=cfg(),l=S.songs.filter(s=>(!art||s.artist===art)&&(!q||(s.title+' '+s.artist).toLowerCase().includes(q)));
   $('#sl').innerHTML=l.length?l.map(s=>'<div class="song"><div class="grow"><b>'+esc(s.title)+'</b><div class="mut small">'+esc(s.artist)+'</div></div>'+
-   '<button class="btn sm" data-id="'+esc(s.id)+'">Pedir</button>'+(c.premium?'<button class="btn neon sm" data-id="'+esc(s.id)+'" data-p="1" title="Pasa al frente de la cola">Prioridad Bs '+esc(c.price)+'</button>':'')+'</div>').join(''):'<p class="mut">'+(S.songs.length?'No hay resultados.':'El catálogo está vacío. Pídele al encargado que cargue canciones.')+'</p>';
+   '<button class="btn sm" data-id="'+esc(s.id)+'">'+ic('mic',16)+' Cantar</button>'+(c.premium?'<button class="btn neon sm" data-id="'+esc(s.id)+'" data-p="1" title="Pasa al frente de la cola">'+ic('crown',16)+' Prioridad Bs '+esc(c.price)+'</button>':'')+'</div>').join(''):'<p class="mut">'+(S.songs.length?'No hay resultados.':'El catálogo está vacío. Pídele al encargado que cargue canciones.')+'</p>';
   const w=waiting(),mine=S.queue.filter(x=>x.mesa==n&&x.status!=='done');
-  $('#my').innerHTML='<h3 style="font-size:16px;margin-bottom:8px">Tus pedidos</h3>'+(mine.length?mine.map(x=>{let st='';if(x.status==='now')st='<span class="tag w">¡Es tu turno!</span>';else if(x.prio&&!x.paid)st='<span class="tag">Esperando pago</span>';else st='<span class="tag p">Posición '+(w.findIndex(y=>y.id===x.id)+1)+'</span>';
+  $('#my').innerHTML=(mine.some(x=>x.status==='now')?'<div class="turn">'+ic('mic',22)+' ¡Es tu turno, sube al escenario!</div>':'')+'<h3 style="font-size:16px;margin-bottom:8px">Tus pedidos</h3>'+(mine.length?mine.map(x=>{let st='';if(x.status==='now')st='<span class="tag w">¡Es tu turno!</span>';else if(x.prio&&!x.paid)st='<span class="tag">Esperando pago</span>';else st='<span class="tag p">Posición '+(w.findIndex(y=>y.id===x.id)+1)+'</span>';
    return '<div class="song"><div class="grow"><b>'+esc(x.title)+'</b><div class="mut small">'+esc(x.artist)+'</div></div>'+st+(x.status==='wait'?'<button class="btn ghost sm" data-del="'+x.id+'">Cancelar</button>':'')+'</div>'}).join(''):'<p class="mut small">Aún no has pedido canciones.</p>')}
  $('#my').onclick=e=>{const b=e.target.closest('[data-del]');if(b)store.del('queue',b.dataset.del)};
  view={upd(){chips();draw()}};view.upd()}
 
 /* ---------- pantalla principal ---------- */
-function pantalla(){const A=$('#app');let cur='';
+function pantalla(){const A=$('#app');let cur='',seen=new Set(),t0=Date.now();
  A.innerHTML='<div class="tv"><main id="main"></main><aside id="side" class="stack"></aside></div>'+
  '<button class="btn ghost sm" id="fs" style="position:fixed;right:12px;bottom:12px">Pantalla completa</button>';
  $('#fs').onclick=()=>{try{document.documentElement.requestFullscreen()}catch(e){};$('#fs').remove()};
  window.onmessage=e=>{if(!/youtube/.test(e.origin))return;let d;try{d=JSON.parse(e.data)}catch(x){return}
-  if(d&&d.event==='onStateChange'&&d.info===0&&cfg().auto)next()};
+  if(d&&d.event==='onStateChange'&&d.info===0&&cfg().auto)next();
+  if(d&&d.event==='onError'){const n=nowP();if(n){const s=S.songs.find(x=>x.id===n.songId);if(s&&!s.bad)store.set('songs',s.id,Object.assign({},s,{bad:true}));
+   const v=$('#vd');if(v&&!$('#vw'))v.insertAdjacentHTML('afterend','<p id="vw" class="glow" style="margin:10px 0 0">Este video no permite reproducirse en otras páginas. Pulsa «Mirar en YouTube» o elige una versión karaoke.</p>')}}};
  view={upd(){const n=nowP(),c=cfg(),w=waiting();
+  S.claps.filter(k=>!seen.has(k.id)&&k.ts>=t0-5000).forEach(k=>{seen.add(k.id);burst(k);store.del('claps',k.id)});
   if(n){const id=ytId(n.video);
-   if(cur!==n.id){cur=n.id;$('#main').innerHTML='<div class="vid" id="vd">'+(id?'<iframe title="Video" allow="autoplay; encrypted-media; fullscreen" src="https://www.youtube-nocookie.com/embed/'+id+'?autoplay=1&enablejsapi=1&rel=0&origin='+encodeURIComponent(location.origin)+'"></iframe>':'<div class="idle" style="height:100%;border:0"><div><h2 class="glow">Sin video</h2><p class="mut">Esta canción no tiene enlace de YouTube. Usa «Siguiente» en el panel.</p></div></div>')+'</div><div class="now" id="nw"></div><div class="mut" id="ns"></div><p class="small"><a id="yl" target="_blank" rel="noopener" style="color:var(--brass)"></a></p>';
-    const f=$('#vd iframe');if(f)f.onload=()=>{try{f.contentWindow.postMessage(JSON.stringify({event:'listening',id:1,channel:'widget'}),'*')}catch(x){}}}
+   if(cur!==n.id){cur=n.id;$('#main').innerHTML='<div class="vid" id="vd">'+(id?'<iframe title="Video" allow="autoplay; encrypted-media; fullscreen" data-src="https://www.youtube-nocookie.com/embed/'+id+'?autoplay=1&enablejsapi=1&rel=0&origin='+encodeURIComponent(location.origin)+'"></iframe>':'<div class="idle" style="height:100%;border:0"><div><h2 class="glow">Sin video</h2><p class="mut">Esta canción no tiene enlace de YouTube. Usa «Siguiente» en el panel.</p></div></div>')+'</div><div class="now" id="nw"></div><div class="mut" id="ns"></div><p><span class="eq"><i></i><i></i><i></i><i></i></span> <b id="cc">0 aplausos</b></p><p class="small"><a id="yl" target="_blank" rel="noopener" style="color:var(--brass)"></a></p>';
+    const f=$('#vd iframe');if(f)f.onload=()=>{try{f.contentWindow.postMessage(JSON.stringify({event:'listening',id:1,channel:'widget'}),'*')}catch(x){}};cc=0;announce(n);if(f){const my=n.id;setTimeout(()=>{if(cur===my)f.src=f.dataset.src},3800)}}
    $('#nw').textContent=n.title;$('#ns').textContent=n.artist+' · canta '+n.singer+' (mesa '+n.mesa+')';const yl=$('#yl');yl.href=id?'https://www.youtube.com/watch?v='+id:'https://www.youtube.com/results?search_query='+encodeURIComponent(n.title+' '+n.artist+' karaoke');yl.textContent=id?'¿No carga el video? Ábrelo en YouTube':'Buscar karaoke de esta canción en YouTube'}
   else{cur='';const top={};S.queue.filter(q=>q.status==='done').forEach(q=>top[q.singer]=(top[q.singer]||0)+1);const t=Object.entries(top).sort((a,b)=>b[1]-a[1]).slice(0,5);
-   $('#main').innerHTML='<h1>'+esc(c.bar)+'</h1><div class="idle" style="margin-top:16px"><div><h2 class="glow" style="font-size:clamp(26px,4vw,52px)">Escanea el QR de tu mesa</h2><p class="mut">Elige tu canción desde el celular y sube al escenario.</p>'+(t.length?'<p style="margin-top:18px"><b>Más cantores de la noche</b><br>'+t.map(x=>esc(x[0])+' ('+x[1]+')').join(' · ')+'</p>':'')+'</div></div>'}
+   $('#main').innerHTML='<h1>'+esc(c.bar)+'</h1><div class="idle" style="margin-top:16px"><div>'+vinyl(140)+'<h2 class="glow" style="font-size:clamp(26px,4vw,52px)">Escanea el QR de tu mesa</h2><p class="mut">Elige tu canción desde el celular y sube al escenario.</p>'+(t.length?'<p style="margin-top:18px"><b>Más cantores de la noche</b><br>'+t.map(x=>esc(x[0])+' ('+x[1]+')').join(' · ')+'</p>':'')+'</div></div>'}
   $('#side').innerHTML='<div class="card"><h3 style="font-size:18px;color:var(--brass)">Próximos</h3>'+(w.length?w.slice(0,6).map((x,i)=>'<div class="song"><span class="tag '+(x.prio?'p':'')+'">'+(i+1)+'</span><div class="grow"><b>'+esc(x.singer)+'</b><div class="mut small">'+esc(x.title)+' · '+esc(x.artist)+'</div></div></div>').join(''):'<p class="mut">La cola está libre. ¡Anímate a pedir!</p>')+'</div>'}};view.upd()}
 
 /* ---------- panel de control ---------- */
@@ -165,8 +212,8 @@ function panel(){const A=$('#app');
    $('#add').onclick=()=>{const t=$('#t').value.trim(),a=$('#a').value.trim(),v=$('#v').value.trim();if(!t||!a)return toast('Escribe título e intérprete');if(v&&!ytId(v))return toast('El enlace de YouTube no es válido');
     store.set('songs',uid('s'),{title:t,artist:a,video:ytId(v)});$('#t').value=$('#a').value=$('#v').value='';toast('Canción agregada')};
    $('#demo').onclick=()=>[['Bésame Mucho','Consuelo Velázquez'],['Cielito Lindo','Quirino Mendoza'],['El Rey','José Alfredo Jiménez'],['La Bamba','Ritchie Valens'],['Volver','Carlos Gardel'],['Y Volveré','Los Ángeles Negros']].forEach(x=>store.set('songs',uid('s'),{title:x[0],artist:x[1],video:''}));
-   $('#sl').onclick=e=>{const sv=e.target.closest('[data-sv]');if(sv){const inp=$('[data-vi="'+sv.dataset.sv+'"]'),id=ytId(inp.value),song=S.songs.find(x=>x.id===sv.dataset.sv);if(!id)return toast('Enlace de YouTube no válido');store.set('songs',song.id,Object.assign({},song,{video:id}));toast('Video guardado');return}const b=e.target.closest('[data-rm]');if(b)store.del('songs',b.dataset.rm)}},
-  upd(){$('#sl').innerHTML=S.songs.length?S.songs.slice().sort((a,b)=>a.artist.localeCompare(b.artist)).map(s=>'<div class="song"><div class="grow"><b>'+esc(s.title)+'</b><div class="mut small">'+esc(s.artist)+' · '+(s.video?'con video':'sin video')+'</div></div><a class="btn ghost sm" target="_blank" rel="noopener" href="https://www.youtube.com/results?search_query='+encodeURIComponent(s.title+' '+s.artist+' karaoke')+'">Buscar video</a><button class="btn ghost sm" data-rm="'+s.id+'">Borrar</button><input data-vi="'+s.id+'" placeholder="Pegar enlace de YouTube" style="flex:1 1 160px" aria-label="Enlace de YouTube"><button class="btn sm" data-sv="'+s.id+'">Guardar video</button></div>').join(''):'<p class="mut">Catálogo vacío. Agrega canciones o carga los ejemplos.</p>'}},
+   $('#sl').onclick=e=>{const sv=e.target.closest('[data-sv]');if(sv){const inp=$('[data-vi="'+sv.dataset.sv+'"]'),id=ytId(inp.value),song=S.songs.find(x=>x.id===sv.dataset.sv);if(!id)return toast('Enlace de YouTube no válido');store.set('songs',song.id,Object.assign({},song,{video:id,bad:false}));toast('Video guardado');return}const b=e.target.closest('[data-rm]');if(b)store.del('songs',b.dataset.rm)}},
+  upd(){$('#sl').innerHTML=S.songs.length?S.songs.slice().sort((a,b)=>a.artist.localeCompare(b.artist)).map(s=>'<div class="song"><div class="grow"><b>'+esc(s.title)+'</b><div class="mut small">'+esc(s.artist)+' · '+(s.video?'con video':'sin video')+(s.bad?' · ⚠ bloqueado para web, pega otro video':'')+'</div></div><a class="btn ghost sm" target="_blank" rel="noopener" href="https://www.youtube.com/results?search_query='+encodeURIComponent(s.title+' '+s.artist+' karaoke')+'">Buscar video</a><button class="btn ghost sm" data-rm="'+s.id+'">Borrar</button><input data-vi="'+s.id+'" placeholder="Pegar enlace de YouTube" style="flex:1 1 160px" aria-label="Enlace de YouTube"><button class="btn sm" data-sv="'+s.id+'">Guardar video</button></div>').join(''):'<p class="mut">Catálogo vacío. Agrega canciones o carga los ejemplos.</p>'}},
  qr:{mount(){const c=cfg();$('#pb').innerHTML='<div class="row" style="margin-bottom:12px"><input id="nmz" type="number" min="1" max="60" value="'+esc(c.mesas)+'" aria-label="Cantidad de mesas"><button class="btn" id="gen">Generar QR</button><button class="btn ghost" onclick="print()">Imprimir</button></div><div class="qrs" id="qg"></div><p class="small mut">Cada QR abre la rockola ya ubicada en su mesa.</p>';
    const g=()=>{const k=Math.min(60,Math.max(1,parseInt($('#nmz').value)||1));$('#qg').innerHTML=Array.from({length:k},(_,i)=>'<div class="card">'+qrSvg(base()+'#mesa-'+(i+1))+'<b>Mesa '+(i+1)+'</b></div>').join('')};$('#gen').onclick=g;g()},upd(){}},
  aj:{mount(){const c=cfg();$('#pb').innerHTML='<div class="card stack"><label>Nombre del local<input id="s1" value="'+esc(c.bar)+'"></label><label>Pedidos máximos por mesa<input id="s2" type="number" min="1" value="'+esc(c.max)+'"></label><label>Cantidad de mesas<input id="s3" type="number" min="1" value="'+esc(c.mesas)+'"></label>'+
@@ -180,7 +227,7 @@ function sessionStorageOK(k,v){try{if(v!==undefined)sessionStorage.setItem(k,v);
 /* ---------- ruteo e inicio ---------- */
 function route(){const h=location.hash.slice(1),m=h.match(/^mesa-(\d+)$/);window.onmessage=null;
  if(h==='pantalla')pantalla();else if(h==='panel')panel();else if(m)mesa(+m[1]);else home()}
-function attach(st){store=st;['songs','queue','cfg'].forEach(n=>st.sub(n,r=>{if(store!==st)return;S[n]=r;try{view.upd()}catch(e){console.error(e)}}))}
+function attach(st){store=st;['songs','queue','cfg','claps'].forEach(n=>st.sub(n,r=>{if(store!==st)return;S[n]=r;try{view.upd()}catch(e){console.error(e)}}))}
 async function init(){
  addEventListener('hashchange',route);
  if(FB.apiKey&&FB.apiKey!=='PEGA_AQUI'){try{attach(await fireStore());route();return}catch(e){console.error(e);toast('No se pudo conectar a Firebase')}}

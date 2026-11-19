@@ -232,19 +232,20 @@ function home(){const A=$('#app');
  view={upd(){const m=$('#mode');if(m)m.textContent=store&&store.mode==='cloud'?'Conectado a la nube: todos los dispositivos comparten la cola.':'Modo local: los datos solo se comparten entre pestañas de este navegador.'}};view.upd()}
 
 /* ---------- mesa (cliente) ---------- */
-function guiaCliente(){return '<h2 style="font-size:22px">Cómo pedir tu canción</h2><ol class="steps"><li><span>Escribe tu nombre para que te llamen al escenario.</span></li><li><span>Busca por canción o artista. También puedes filtrar por <b>idioma</b> y por <b>voz</b>: hombre, mujer, dúo o trío.</span></li><li><span>Toca <b>Cantar</b>. Con <b>Prioridad</b> pasas al frente de la cola y pagas en caja.</span></li><li><span>¿No está tu canción? Si ves el botón <b>Buscar en YouTube</b>, úsalo, elige un karaoke y toca Cantar.</span></li><li><span>En <b>Tus pedidos</b> ves tu posición. Cuando diga «¡Es tu turno!», sube al escenario.</span></li><li><span>Mientras cantan otros, aplaude con los emojis de abajo.</span></li></ol>'}
+function guiaCliente(){return '<h2 style="font-size:22px">Cómo pedir tu canción</h2><ol class="steps"><li><span>Escribe tu nombre para que te llamen al escenario.</span></li><li><span>Escribe y pulsa <b>Buscar en el catálogo</b> para ver las canciones del local. También puedes filtrar por <b>idioma</b> y por <b>voz</b>: hombre, mujer, dúo o trío.</span></li><li><span>Toca <b>Cantar</b>. Con <b>Prioridad</b> pasas al frente de la cola y pagas en caja.</span></li><li><span>¿No está tu canción? Pulsa <b>Buscar en YouTube</b> (si ves el botón): los resultados salen más abajo. Elige un karaoke y toca Cantar.</span></li><li><span>En <b>Tus pedidos</b> ves tu posición. Cuando diga «¡Es tu turno!», sube al escenario.</span></li><li><span>Mientras cantan otros, aplaude con los emojis de abajo.</span></li></ol>'}
 function mesa(n){const A=$('#app');let q='',art='',lang='',voz='',yt=null,ytq='',tok=0;
  let nm='';try{nm=localStorage.getItem('rk_name')||''}catch(e){}
  A.innerHTML=head(cfg().bar,'<button class="btn ghost sm" id="hp">? Ayuda</button> <span class="tag p">Mesa '+n+'</span>')+'<div class="wrap stack">'+
  '<div class="card stack"><input id="nm" placeholder="Tu nombre (para llamarte al escenario)" value="'+esc(nm)+'" maxlength="30" aria-label="Tu nombre">'+
- '<div class="row srow"><input id="sq" type="search" placeholder="Buscar canción o intérprete" aria-label="Buscar"><button class="btn sm" id="yb" hidden>Buscar en YouTube</button></div></div>'+
+ '<input id="sq" type="search" placeholder="Escribe canción o intérprete" aria-label="Buscar"><div class="row"><button class="btn grow" id="kb">Buscar en el catálogo</button><button class="btn neon grow" id="yb" hidden>Buscar en YouTube</button></div></div>'+
  '<div class="card" id="fl"></div><div id="np"></div><h3 class="sec" id="st"></h3><div class="card" id="sl"></div><div class="card" id="yt" hidden></div><div class="card" id="my"></div></div><div class="react" id="rx">'+['👏','🔥','❤️','🎉'].map(e=>'<button data-e="'+e+'" aria-label="Reaccionar '+e+'">'+e+'</button>').join('')+'</div>';
  $('#hp').onclick=()=>modal(guiaCliente());
  try{if(!localStorage.getItem('rk_g1')){localStorage.setItem('rk_g1','1');setTimeout(()=>modal(guiaCliente()),600)}}catch(e){}
  let lr=0;$('#rx').onclick=e=>{const b=e.target.closest('[data-e]');if(!b||Date.now()-lr<600)return;lr=Date.now();store.set('claps',uid('c'),{mesa:n,e:b.dataset.e,ts:Date.now()});try{navigator.vibrate&&navigator.vibrate(20)}catch(x){}};
  $('#nm').oninput=e=>{try{localStorage.setItem('rk_name',e.target.value)}catch(x){}};
  $('#sq').oninput=e=>{q=nz(e.target.value.trim());draw()};
- $('#sq').onkeydown=e=>{if(e.key==='Enter'&&ytOn())doYt()};
+ $('#sq').onkeydown=e=>{if(e.key==='Enter')doCat()};
+ $('#kb').onclick=doCat;
  $('#yb').onclick=doYt;
  $('#fl').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;if('a' in b.dataset)art=b.dataset.a;else if('lg' in b.dataset)lang=b.dataset.lg;else if('vz' in b.dataset)voz=b.dataset.vz;chips();draw()};
  $('#sl').onclick=e=>{const b=e.target.closest('[data-id]');if(!b)return;const s=songs().find(x=>x.id===b.dataset.id);if(s)request(s,n,$('#nm').value.trim(),b.dataset.p==='1')};
@@ -253,13 +254,14 @@ function mesa(n){const A=$('#app');let q='',art='',lang='',voz='',yt=null,ytq=''
  function chips(){const a=[...new Set(songs().map(s=>s.artist))].sort();
   $('#fl').innerHTML=grp('Idioma',[['','Todos']].concat(LANGS),lang,'lg')+grp('Voz',[['','Todos']].concat(VOCES),voz,'vz')+grp('Artista',[['','Todos']].concat(a.map(x=>[x,x])),art,'a')}
  function ytDraw(){const on=ytOn();$('#yb').hidden=!on;const b=$('#yt');b.hidden=!on;if(!on)return;
-  let h='<h3 style="font-size:16px;margin-bottom:8px">▶ Más karaokes en YouTube</h3>';
-  if(yt==null)h+='<p class="mut small">¿No está tu canción? Escribe el artista o el título arriba y pulsa «Buscar en YouTube».</p>';
+  let h='<h3 style="font-size:16px;margin-bottom:8px">▶ Resultados de YouTube</h3>';
+  if(yt==null)h+='<p class="mut small">¿No está tu canción? Escribe el artista o el título arriba y pulsa el botón «Buscar en YouTube».</p>';
   else if(yt==='load')h+='<p class="mut">Buscando «'+esc(ytq)+'»…</p>';
   else if(typeof yt==='string')h+='<p class="glow">'+esc(yt.slice(4))+'</p>';
   else h+=yt.length?yt.map((r,i)=>'<div class="song">'+(r.th?'<img class="th" loading="lazy" alt="" src="'+esc(r.th)+'">':'')+'<div class="grow"><b>'+esc(cleanT(r.title))+'</b><div class="mut small">'+esc(r.ch)+'</div></div><button class="btn sm" data-y="'+i+'">'+ic('mic',16)+' Cantar</button>'+(cfg().premium?'<button class="btn neon sm" data-y="'+i+'" data-p="1">'+ic('crown',16)+' Prioridad Bs '+esc(cfg().price)+'</button>':'')+'</div>').join(''):'<p class="mut">Sin resultados para «'+esc(ytq)+'».</p>';
   b.innerHTML=h}
- async function doYt(){const t=$('#sq').value.trim();if(!t)return toast('Escribe un artista o una canción');ytq=t;yt='load';ytDraw();const my=++tok;
+ function doCat(){draw();$('#st').scrollIntoView({behavior:'smooth',block:'start'})}
+ async function doYt(){const t=$('#sq').value.trim();if(!t)return toast('Escribe un artista o una canción');ytq=t;yt='load';ytDraw();$('#yt').scrollIntoView({behavior:'smooth',block:'start'});const my=++tok;
   try{const r=await ytSearch(t+(voz==='duo'?' dueto':voz==='trio'?' trío':''),{lang:lang&&lang!=='xx'?lang:''});if(my===tok)yt=r}catch(e){if(my===tok)yt='err:'+ytErr(e)}
   if(my===tok)ytDraw()}
  function draw(){const c=cfg(),l=songs().filter(s=>(!art||s.artist===art)&&(!lang||lg(s)===lang)&&(!voz||vz(s)===voz)&&(!q||nz(s.title+' '+s.artist).includes(q)));

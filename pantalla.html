@@ -141,6 +141,10 @@ body.cine-on #xc{display:inline-flex}body.cine-on.mv #xc{opacity:1}
 <script>
 const DEF={bar:'Rockola Karaoke',premium:true,price:5,max:3,pin:'1234',auto:true,mesas:12,cam:false,camPos:'br',fsAuto:true,ytKey:'',ytClient:true};
 const S={songs:[],queue:[],cfg:[],claps:[]};
+const VER='1.2';
+const LOG=[['1.2','19 nov 2026',['Botones separados: «Buscar en el catálogo» y «Buscar en YouTube».','Los resultados de YouTube salen justo debajo del buscador.','Número de versión visible y lista de novedades en la Guía.']],
+['1.1','19 nov 2026',['Filtros por idioma y voz (hombre, mujer, dúo, trío) en el cliente.','Pantalla completa automática del video después de presentar al cantante.','Aviso «✓ Video guardado» en el catálogo.','Guía rápida para clientes y para el operador.','Búsqueda de karaokes nuevos en YouTube (panel y cliente).']],
+['1.0','Versión inicial',['Cola de pedidos, catálogo de 20 temas y QR por mesa.','Prioridad premium, aplausos y cámara en pantalla.']]];
 const P={mic:'<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4M8 22h8"/>',crown:'<path d="M2 7l5 5 5-8 5 8 5-5-2 12H4z"/>',note:'<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>'};
 const ic=(n,z)=>'<svg width="'+(z||20)+'" height="'+(z||20)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+P[n]+'</svg>';
 const vinyl=z=>'<svg class="vinyl" width="'+z+'" height="'+z+'" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="#0d0609" stroke="#e9b44c" stroke-width="2"/><circle cx="50" cy="50" r="40" fill="none" stroke="#3d2431"/><circle cx="50" cy="50" r="33" fill="none" stroke="#3d2431"/><circle cx="50" cy="50" r="26" fill="none" stroke="#3d2431"/><path d="M50 50L88 18A48 48 0 0 1 98 50z" fill="#fff" opacity=".07"/><circle cx="50" cy="50" r="16" fill="#ff3d6e"/><circle cx="50" cy="50" r="3" fill="#0d0609"/></svg>';
@@ -238,7 +242,7 @@ function mesa(n){const A=$('#app');let q='',art='',lang='',voz='',yt=null,ytq=''
  A.innerHTML=head(cfg().bar,'<button class="btn ghost sm" id="hp">? Ayuda</button> <span class="tag p">Mesa '+n+'</span>')+'<div class="wrap stack">'+
  '<div class="card stack"><input id="nm" placeholder="Tu nombre (para llamarte al escenario)" value="'+esc(nm)+'" maxlength="30" aria-label="Tu nombre">'+
  '<input id="sq" type="search" placeholder="Escribe canción o intérprete" aria-label="Buscar"><div class="row"><button class="btn grow" id="kb">Buscar en el catálogo</button><button class="btn neon grow" id="yb" hidden>Buscar en YouTube</button></div></div>'+
- '<div class="card" id="fl"></div><div id="np"></div><h3 class="sec" id="st"></h3><div class="card" id="sl"></div><div class="card" id="yt" hidden></div><div class="card" id="my"></div></div><div class="react" id="rx">'+['👏','🔥','❤️','🎉'].map(e=>'<button data-e="'+e+'" aria-label="Reaccionar '+e+'">'+e+'</button>').join('')+'</div>';
+ '<div class="card" id="yt" hidden></div><div class="card" id="fl"></div><div id="np"></div><h3 class="sec" id="st"></h3><div class="card" id="sl"></div><div class="card" id="my"></div><p class="small mut" style="text-align:center">Versión '+VER+'</p></div><div class="react" id="rx">'+['👏','🔥','❤️','🎉'].map(e=>'<button data-e="'+e+'" aria-label="Reaccionar '+e+'">'+e+'</button>').join('')+'</div>';
  $('#hp').onclick=()=>modal(guiaCliente());
  try{if(!localStorage.getItem('rk_g1')){localStorage.setItem('rk_g1','1');setTimeout(()=>modal(guiaCliente()),600)}}catch(e){}
  let lr=0;$('#rx').onclick=e=>{const b=e.target.closest('[data-e]');if(!b||Date.now()-lr<600)return;lr=Date.now();store.set('claps',uid('c'),{mesa:n,e:b.dataset.e,ts:Date.now()});try{navigator.vibrate&&navigator.vibrate(20)}catch(x){}};
@@ -253,7 +257,7 @@ function mesa(n){const A=$('#app');let q='',art='',lang='',voz='',yt=null,ytq=''
  function grp(t,items,cur,k){return '<div class="fgrp"><small>'+t+'</small>'+items.map(x=>'<button class="chip'+(cur===x[0]?' on':'')+'" data-'+k+'="'+esc(x[0])+'">'+esc(x[1])+'</button>').join('')+'</div>'}
  function chips(){const a=[...new Set(songs().map(s=>s.artist))].sort();
   $('#fl').innerHTML=grp('Idioma',[['','Todos']].concat(LANGS),lang,'lg')+grp('Voz',[['','Todos']].concat(VOCES),voz,'vz')+grp('Artista',[['','Todos']].concat(a.map(x=>[x,x])),art,'a')}
- function ytDraw(){const on=ytOn();$('#yb').hidden=!on;const b=$('#yt');b.hidden=!on;if(!on)return;
+ function ytDraw(){const on=ytOn();$('#yb').hidden=!on;const b=$('#yt');b.hidden=!on||yt==null;if(!on||yt==null)return;
   let h='<h3 style="font-size:16px;margin-bottom:8px">▶ Resultados de YouTube</h3>';
   if(yt==null)h+='<p class="mut small">¿No está tu canción? Escribe el artista o el título arriba y pulsa el botón «Buscar en YouTube».</p>';
   else if(yt==='load')h+='<p class="mut">Buscando «'+esc(ytq)+'»…</p>';
@@ -325,13 +329,13 @@ function guiaOperador(){const li=t=>'<li><span>'+t+'</span></li>';
  li('En «Credenciales» crea una <b>clave de API</b>.')+
  li('Restríngela a tu sitio web (tu dominio) y solo a YouTube Data API v3.')+
  li('Pégala en <b>Ajustes</b> y guarda. Los clientes también podrán buscar desde su celular.')+'</ol>'+
- '<p class="small mut">Cada búsqueda gasta 100 unidades de la cuota diaria gratuita (por defecto 10 000, unas 100 búsquedas al día entre todos). Si se agota, el catálogo sigue funcionando.</p></div>'}
+ '<p class="small mut">Cada búsqueda gasta 100 unidades de la cuota diaria gratuita (por defecto 10 000, unas 100 búsquedas al día entre todos). Si se agota, el catálogo sigue funcionando.</p></div><div class="card" style="margin-top:12px"><h3 style="font-size:18px">Versión '+VER+'</h3>'+LOG.map(v=>'<h3 class="sec">v'+v[0]+' · '+v[1]+'</h3><ul class="small" style="margin:0;padding-left:18px">'+v[2].map(x=>'<li>'+x+'</li>').join('')+'</ul>').join('')+'</div>'}
 
 function panel(){const A=$('#app');
  if(!isAdmin&&sessionStorageOK('rk_ok')!=='1'){A.innerHTML=head('Panel')+'<div class="wrap"><div class="card stack"><h3>Ingresa el PIN</h3><input id="pin" type="password" inputmode="numeric" aria-label="PIN"><button class="btn" id="ok">Entrar</button><p class="small mut">PIN inicial: 1234. Cámbialo en Ajustes.</p></div></div>';
   $('#ok').onclick=()=>{if($('#pin').value===cfg().pin){sessionStorageOK('rk_ok','1');panel()}else toast('PIN incorrecto')};view={upd(){}};return}
  const T={cola:'Cola',cat:'Catálogo',yt:'Buscar karaoke',qr:'Mesas y QR',aj:'Ajustes',gd:'Guía'};let tab='cola',cur,sig='',yres=null;
- A.innerHTML=head(cfg().bar+' · panel','<a class="btn ghost sm" href="pantalla.html" target="_blank">Abrir pantalla</a>')+'<div class="wrap"><div class="tabs" id="tb">'+Object.entries(T).map(([k,v])=>'<button class="chip" data-t="'+k+'">'+v+'</button>').join('')+'</div><div id="pb"></div></div>';
+ A.innerHTML=head(cfg().bar+' · panel','<span class="tag">v'+VER+'</span> <a class="btn ghost sm" href="pantalla.html" target="_blank">Abrir pantalla</a>')+'<div class="wrap"><div class="tabs" id="tb">'+Object.entries(T).map(([k,v])=>'<button class="chip" data-t="'+k+'">'+v+'</button>').join('')+'</div><div id="pb"></div></div>';
  $('#tb').onclick=e=>{const b=e.target.closest('[data-t]');if(b){tab=b.dataset.t;show()}};
  const tabs={
  cola:{mount(){$('#pb').innerHTML='<div id="pc" class="stack"></div>';$('#pc').onclick=e=>{const b=e.target.closest('[data-a]');if(!b)return;const q=S.queue.find(x=>x.id===b.dataset.id),a=b.dataset.a;

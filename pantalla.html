@@ -109,6 +109,29 @@ body[data-p="panel"]{--brass:#7fe0c3;--neon:#4fb3ff}
 .btn.neon::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.45) 50%,transparent 70%);transform:translateX(-120%);animation:shine 3.2s infinite}
 @keyframes shine{to{transform:translateX(120%)}}
 .song:hover{background:rgba(255,255,255,.03)}
+
+[hidden]{display:none!important}
+.row{flex-wrap:wrap}
+.srow>input{flex:1 1 0;min-width:0}.srow>.btn{flex:none}
+.fgrp{display:flex;gap:6px;align-items:center;overflow-x:auto;padding:2px 0}
+.fgrp>small{color:var(--mut);flex:none;min-width:52px;font-weight:600}
+.song select{width:auto;padding:6px 8px;font-size:14px}
+.tag.ok{background:var(--ok);color:#06241a}
+.flash{animation:flash 2.4s ease-out}
+@keyframes flash{0%,65%{background:color-mix(in srgb,var(--ok) 30%,transparent)}}
+.th{width:96px;height:54px;border-radius:8px;object-fit:cover;flex:none;background:#000}
+.modal{position:fixed;inset:0;z-index:30;display:grid;place-items:center;padding:16px;background:rgba(10,3,8,.78);backdrop-filter:blur(4px)}
+.modal .card{max-width:480px;width:100%;max-height:88vh;overflow:auto}
+.steps{counter-reset:s;list-style:none;margin:10px 0 14px;padding:0}
+.steps li{counter-increment:s;display:flex;gap:12px;padding:7px 0;align-items:flex-start}
+.steps li::before{content:counter(s);flex:none;width:26px;height:26px;border-radius:50%;background:var(--brass);color:var(--on);display:grid;place-items:center;font:700 14px Outfit,sans-serif}
+.vid.cine{position:fixed;inset:0;z-index:12;width:100%;height:100%;aspect-ratio:auto;border:0;border-radius:0}
+.camw{z-index:13}
+#fs,#cb{z-index:14}
+#xc{position:fixed;right:14px;top:14px;z-index:14;display:none;opacity:0;transition:opacity .3s}
+body.cine-on #xc{display:inline-flex}body.cine-on.mv #xc{opacity:1}
+.lt{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:13;max-width:80vw;padding:12px 20px;border-radius:12px;background:rgba(10,3,8,.74);backdrop-filter:blur(6px);border-left:4px solid var(--neon);color:#fff;font-size:clamp(16px,2.2vw,28px);animation:ltout .6s 7s forwards;pointer-events:none}
+@keyframes ltout{to{opacity:0;visibility:hidden}}
 </style>
 </head>
 <body data-p="pantalla">
@@ -116,7 +139,7 @@ body[data-p="panel"]{--brass:#7fe0c3;--neon:#4fb3ff}
 <div id="toast" role="status"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <script>
-const DEF={bar:'Rockola Karaoke',premium:true,price:5,max:3,pin:'1234',auto:true,mesas:12,cam:false,camPos:'br'};
+const DEF={bar:'Rockola Karaoke',premium:true,price:5,max:3,pin:'1234',auto:true,mesas:12,cam:false,camPos:'br',fsAuto:true,ytKey:'',ytClient:true};
 const S={songs:[],queue:[],cfg:[],claps:[]};
 const P={mic:'<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4M8 22h8"/>',crown:'<path d="M2 7l5 5 5-8 5 8 5-5-2 12H4z"/>',note:'<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>'};
 const ic=(n,z)=>'<svg width="'+(z||20)+'" height="'+(z||20)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+P[n]+'</svg>';
@@ -124,7 +147,28 @@ const vinyl=z=>'<svg class="vinyl" width="'+z+'" height="'+z+'" viewBox="0 0 100
 let cc=0;
 const SEED=[{"id": "k01", "title": "Llorando se fue", "artist": "Los Kjarkas", "video": "Yu5FIkja_ac"}, {"id": "k02", "title": "Hasta que te conocí", "artist": "Juan Gabriel", "video": "rfwVxgkx_Q8"}, {"id": "k03", "title": "Amor eterno", "artist": "Juan Gabriel · Rocío Dúrcal", "video": "lmpu-TapWiE"}, {"id": "k04", "title": "El rey", "artist": "José Alfredo Jiménez", "video": "2iFUHvnPw4U"}, {"id": "k05", "title": "Volver, volver", "artist": "Vicente Fernández", "video": "gHv4uIAbqyk"}, {"id": "k06", "title": "Mujeres divinas", "artist": "Vicente Fernández", "video": "y-jrP3XS3Zc"}, {"id": "k07", "title": "Si nos dejan", "artist": "Luis Miguel", "video": "GgAJOEkji1A"}, {"id": "k08", "title": "La incondicional", "artist": "Luis Miguel", "video": "mz3UmLV3GQg"}, {"id": "k09", "title": "Bésame mucho", "artist": "Consuelo Velázquez", "video": "FdKhNlmwdhQ"}, {"id": "k10", "title": "Sabor a mí", "artist": "Eydie Gormé · Los Panchos", "video": "SjFa7U4vhNc"}, {"id": "k11", "title": "Rata de dos patas", "artist": "Paquita la del Barrio", "video": "2L1pmrObw3U"}, {"id": "k12", "title": "Tu cárcel", "artist": "Los Bukis", "video": "N43_aI15eZI"}, {"id": "k13", "title": "Y volveré", "artist": "Los Ángeles Negros", "video": "wkKwcO0608c"}, {"id": "k14", "title": "Cielito lindo", "artist": "Mariachi Vargas", "video": "DLVnfDS8uCo"}, {"id": "k15", "title": "Vivir mi vida", "artist": "Marc Anthony", "video": "7JixobgHhYA"}, {"id": "k16", "title": "Corazón partío", "artist": "Alejandro Sanz", "video": "LYiI-QCFIoQ"}, {"id": "k17", "title": "Bailando", "artist": "Enrique Iglesias", "video": "mgPf4mYE-fw"}, {"id": "k18", "title": "Color esperanza", "artist": "Diego Torres", "video": "00D4HznH2xw"}, {"id": "k19", "title": "El triste", "artist": "José José", "video": "bBRkfqaYHqs"}, {"id": "k20", "title": "Despacito", "artist": "Luis Fonsi", "video": "hVW2G5CzrrI"}];
 const songs=()=>S.songs.length?S.songs:SEED;
-function seedAll(force){SEED.forEach(x=>{if(force||!S.songs.some(s=>s.id===x.id))store.set('songs',x.id,{title:x.title,artist:x.artist,video:x.video})});if(force)toast('20 temas cargados')}
+const SM={k01:['es','hombre'],k02:['es','hombre'],k03:['es','mujer'],k04:['es','hombre'],k05:['es','hombre'],k06:['es','hombre'],k07:['es','hombre'],k08:['es','hombre'],k09:['es','hombre'],k10:['es','mujer'],k11:['es','mujer'],k12:['es','hombre'],k13:['es','hombre'],k14:['es','hombre'],k15:['es','hombre'],k16:['es','hombre'],k17:['es','hombre'],k18:['es','hombre'],k19:['es','hombre'],k20:['es','hombre']};
+const LANGS=[['es','Español'],['en','Inglés'],['pt','Portugués'],['xx','Otro']];
+const VOCES=[['hombre','Hombre'],['mujer','Mujer'],['duo','Dúo'],['trio','Trío']];
+const lg=s=>s.lang||(SM[s.id]||[])[0]||'';
+const vz=s=>s.voz||(SM[s.id]||[])[1]||'';
+const lab=(a,k)=>(a.find(x=>x[0]===k)||[0,k])[1];
+const opts=(a,cur,ph)=>(ph!==undefined?'<option value="">'+ph+'</option>':'')+a.map(x=>'<option value="'+x[0]+'"'+(x[0]===cur?' selected':'')+'>'+x[1]+'</option>').join('');
+const nz=t=>String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+const dec=t=>{const e=document.createElement('textarea');e.innerHTML=String(t||'');return e.value};
+const cleanT=t=>(t.replace(/[\(\[][^\)\]]*(karaoke|instrumental|letra|lyrics|pista)[^\)\]]*[\)\]]/gi,'').replace(/\s*[-|–]\s*karaoke.*$/i,'').replace(/\s+/g,' ').trim())||t;
+const ytOn=()=>!!cfg().ytKey&&cfg().ytClient!==false;
+const ytCache={};
+async function ytSearch(q,o){o=o||{};const key=cfg().ytKey;if(!key)throw new Error('nokey');
+ const qq=/karaok|instrumental|pista/i.test(q)?q:q+' karaoke',ck=qq+'|'+(o.lang||'');if(ytCache[ck])return ytCache[ck];
+ const u='https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&videoEmbeddable=true&videoSyndicated=true&maxResults=12&q='+encodeURIComponent(qq)+(o.lang?'&relevanceLanguage='+o.lang:'')+'&key='+encodeURIComponent(key);
+ const r=await fetch(u),j=await r.json();
+ if(!r.ok){const er=j&&j.error&&j.error.errors&&j.error.errors[0];throw new Error((er&&er.reason)||('http'+r.status))}
+ return ytCache[ck]=(j.items||[]).filter(i=>i.id&&i.id.videoId).map(i=>{const t=i.snippet.thumbnails||{};return{id:i.id.videoId,title:dec(i.snippet.title),ch:dec(i.snippet.channelTitle),th:(t.medium||t.default||{}).url||''}})}
+function ytErr(e){const m=String(e&&e.message||e);if(m==='quotaExceeded')return 'Se agotó el límite diario de búsquedas de YouTube. Usa el catálogo o inténtalo mañana.';if(/keyInvalid|badRequest|forbidden|accessNotConfigured|ipRefererBlocked|nokey/i.test(m))return 'La clave de YouTube no es válida o no tiene permiso en este sitio. Avisa al encargado.';return 'No se pudo buscar en YouTube. Revisa tu conexión e inténtalo de nuevo.'}
+function mark(id){(S._sv=S._sv||{})[id]=1;try{view.upd()}catch(e){}setTimeout(()=>{delete S._sv[id];try{view.upd()}catch(e){}},6000)}
+function modal(h){const m=document.createElement('div');m.className='modal';m.setAttribute('role','dialog');m.setAttribute('aria-modal','true');m.innerHTML='<div class="card">'+h+'<button class="btn" style="width:100%" data-x>Entendido</button></div>';m.onclick=e=>{if(e.target===m||e.target.closest('[data-x]'))m.remove()};document.body.appendChild(m);const b=m.querySelector('[data-x]');if(b)b.focus()}
+function seedAll(force){SEED.forEach(x=>{if(force||!S.songs.some(s=>s.id===x.id))store.set('songs',x.id,{title:x.title,artist:x.artist,video:x.video,lang:SM[x.id][0],voz:SM[x.id][1]})});if(force)toast('20 temas cargados')}
 function grad(a){let h=0;for(const c of String(a))h=(h*31+c.charCodeAt(0))%360;return 'linear-gradient(135deg,hsl('+h+',70%,55%),hsl('+((h+50)%360)+',70%,38%))'}
 async function verify(){toast('Verificando videos…');let ok=0,bad=0,unk=0;for(const s of S.songs){if(!s.video)continue;try{const r=await fetch('https://www.youtube.com/oembed?format=json&url='+encodeURIComponent('https://www.youtube.com/watch?v='+s.video));if(r.ok){ok++;if(s.bad)store.set('songs',s.id,Object.assign({},s,{bad:false}))}else{bad++;store.set('songs',s.id,Object.assign({},s,{bad:true}))}}catch(e){unk++}}toast(ok||bad?ok+' correctos, '+bad+' con problema':'Este navegador no permite verificar; usa «Probar» en cada tema')}
 const PAGE=document.documentElement.dataset.page||'home';
@@ -154,7 +198,7 @@ function localStore(){const mem={},subs={};
  const save=n=>{try{localStorage.setItem('rk_'+n,JSON.stringify(mem[n]))}catch(e){}};
  addEventListener('storage',e=>{if(e.key&&e.key.indexOf('rk_')===0){const n=e.key.slice(3);load(n);emit(n)}});
  return{mode:'local',sub(n,f){load(n);(subs[n]=subs[n]||[]).push(f);f(rows(n))},
-  set(n,id,d){load(n);mem[n][id]=d;save(n);emit(n)},del(n,id){load(n);delete mem[n][id];save(n);emit(n)}}}
+  set(n,id,d){load(n);mem[n][id]=d;save(n);emit(n);return true},del(n,id){load(n);delete mem[n][id];save(n);emit(n)}}}
 const FB={apiKey:"AIzaSyD1Xpv_gCCY0LXRoyC7r_veJYmQqVhRlcU",authDomain:"rockolaqr.firebaseapp.com",projectId:"rockolaqr",storageBucket:"rockolaqr.firebasestorage.app",messagingSenderId:"48675212571",appId:"1:48675212571:web:9b2f0e902cdb196b6597be"};
 async function fireStore(){
  const A=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
@@ -162,7 +206,7 @@ async function fireStore(){
  const db=F.getFirestore(A.initializeApp(FB));
  return{mode:'cloud',
   sub(n,f){F.onSnapshot(F.collection(db,n),sn=>f(sn.docs.map(d=>Object.assign({},d.data(),{id:d.id}))),e=>toast('Error de nube: '+e.code))},
-  set(n,id,d){const o=Object.assign({},d);delete o.id;return F.setDoc(F.doc(db,n,id),o).catch(e=>toast('No se pudo guardar: '+e.code))},
+  set(n,id,d){const o=Object.assign({},d);delete o.id;return F.setDoc(F.doc(db,n,id),o).then(()=>true).catch(e=>{toast('No se pudo guardar: '+e.code);return false})},
   del(n,id){return F.deleteDoc(F.doc(db,n,id)).catch(e=>toast('No se pudo borrar: '+e.code))}}}
 
 /* ---------- acciones ---------- */
@@ -188,54 +232,103 @@ function home(){const A=$('#app');
  view={upd(){const m=$('#mode');if(m)m.textContent=store&&store.mode==='cloud'?'Conectado a la nube: todos los dispositivos comparten la cola.':'Modo local: los datos solo se comparten entre pestañas de este navegador.'}};view.upd()}
 
 /* ---------- mesa (cliente) ---------- */
-function mesa(n){const A=$('#app');let q='',art='';
+function guiaCliente(){return '<h2 style="font-size:22px">Cómo pedir tu canción</h2><ol class="steps"><li><span>Escribe tu nombre para que te llamen al escenario.</span></li><li><span>Busca por canción o artista. También puedes filtrar por <b>idioma</b> y por <b>voz</b>: hombre, mujer, dúo o trío.</span></li><li><span>Toca <b>Cantar</b>. Con <b>Prioridad</b> pasas al frente de la cola y pagas en caja.</span></li><li><span>¿No está tu canción? Si ves el botón <b>Buscar en YouTube</b>, úsalo, elige un karaoke y toca Cantar.</span></li><li><span>En <b>Tus pedidos</b> ves tu posición. Cuando diga «¡Es tu turno!», sube al escenario.</span></li><li><span>Mientras cantan otros, aplaude con los emojis de abajo.</span></li></ol>'}
+function mesa(n){const A=$('#app');let q='',art='',lang='',voz='',yt=null,ytq='',tok=0;
  let nm='';try{nm=localStorage.getItem('rk_name')||''}catch(e){}
- A.innerHTML=head(cfg().bar,'<span class="tag p">Mesa '+n+'</span>')+'<div class="wrap stack">'+
+ A.innerHTML=head(cfg().bar,'<button class="btn ghost sm" id="hp">? Ayuda</button> <span class="tag p">Mesa '+n+'</span>')+'<div class="wrap stack">'+
  '<div class="card stack"><input id="nm" placeholder="Tu nombre (para llamarte al escenario)" value="'+esc(nm)+'" maxlength="30" aria-label="Tu nombre">'+
- '<input id="sq" type="search" placeholder="Buscar canción o intérprete" aria-label="Buscar"></div>'+
- '<div id="np"></div><div class="chips" id="ch"></div><h3 class="sec">★ TOP 20 · ESPAÑOL LATINO</h3><div class="card" id="sl"></div><div class="card" id="my"></div></div><div class="react" id="rx">'+['👏','🔥','❤️','🎉'].map(e=>'<button data-e="'+e+'" aria-label="Reaccionar '+e+'">'+e+'</button>').join('')+'</div>';
+ '<div class="row srow"><input id="sq" type="search" placeholder="Buscar canción o intérprete" aria-label="Buscar"><button class="btn sm" id="yb" hidden>Buscar en YouTube</button></div></div>'+
+ '<div class="card" id="fl"></div><div id="np"></div><h3 class="sec" id="st"></h3><div class="card" id="sl"></div><div class="card" id="yt" hidden></div><div class="card" id="my"></div></div><div class="react" id="rx">'+['👏','🔥','❤️','🎉'].map(e=>'<button data-e="'+e+'" aria-label="Reaccionar '+e+'">'+e+'</button>').join('')+'</div>';
+ $('#hp').onclick=()=>modal(guiaCliente());
+ try{if(!localStorage.getItem('rk_g1')){localStorage.setItem('rk_g1','1');setTimeout(()=>modal(guiaCliente()),600)}}catch(e){}
  let lr=0;$('#rx').onclick=e=>{const b=e.target.closest('[data-e]');if(!b||Date.now()-lr<600)return;lr=Date.now();store.set('claps',uid('c'),{mesa:n,e:b.dataset.e,ts:Date.now()});try{navigator.vibrate&&navigator.vibrate(20)}catch(x){}};
  $('#nm').oninput=e=>{try{localStorage.setItem('rk_name',e.target.value)}catch(x){}};
- $('#sq').oninput=e=>{q=e.target.value.toLowerCase();draw()};
- $('#ch').onclick=e=>{const c=e.target.closest('[data-a]');if(c){art=c.dataset.a;chips();draw()}};
+ $('#sq').oninput=e=>{q=nz(e.target.value.trim());draw()};
+ $('#sq').onkeydown=e=>{if(e.key==='Enter'&&ytOn())doYt()};
+ $('#yb').onclick=doYt;
+ $('#fl').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;if('a' in b.dataset)art=b.dataset.a;else if('lg' in b.dataset)lang=b.dataset.lg;else if('vz' in b.dataset)voz=b.dataset.vz;chips();draw()};
  $('#sl').onclick=e=>{const b=e.target.closest('[data-id]');if(!b)return;const s=songs().find(x=>x.id===b.dataset.id);if(s)request(s,n,$('#nm').value.trim(),b.dataset.p==='1')};
- function chips(){const a=[...new Set(songs().map(s=>s.artist))].sort();$('#ch').innerHTML=['Todos',...a].map(x=>'<button class="chip'+((x==='Todos'?'':x)===art?' on':'')+'" data-a="'+(x==='Todos'?'':esc(x))+'">'+esc(x)+'</button>').join('')}
- function draw(){const c=cfg(),l=songs().filter(s=>(!art||s.artist===art)&&(!q||(s.title+' '+s.artist).toLowerCase().includes(q)));
-  $('#sl').innerHTML=l.length?l.map((s,i)=>'<div class="song"><span class="rk">'+(i+1)+'</span><span class="av" style="background:'+grad(s.artist)+'">'+esc(String(s.artist||'?')[0])+'</span><div class="grow"><b>'+esc(s.title)+'</b><div class="mut small">'+esc(s.artist)+'</div></div>'+
-   '<button class="btn sm" data-id="'+esc(s.id)+'">'+ic('mic',16)+' Cantar</button>'+(c.premium?'<button class="btn neon sm" data-id="'+esc(s.id)+'" data-p="1" title="Pasa al frente de la cola">'+ic('crown',16)+' Prioridad Bs '+esc(c.price)+'</button>':'')+'</div>').join(''):'<p class="mut">'+(S.songs.length?'No hay resultados.':'El catálogo está vacío. Pídele al encargado que cargue canciones.')+'</p>';
+ $('#yt').onclick=e=>{const b=e.target.closest('[data-y]');if(!b||!Array.isArray(yt))return;const r=yt[+b.dataset.y];if(r)request({id:'yt_'+r.id,title:cleanT(r.title),artist:r.ch,video:r.id},n,$('#nm').value.trim(),b.dataset.p==='1')};
+ function grp(t,items,cur,k){return '<div class="fgrp"><small>'+t+'</small>'+items.map(x=>'<button class="chip'+(cur===x[0]?' on':'')+'" data-'+k+'="'+esc(x[0])+'">'+esc(x[1])+'</button>').join('')+'</div>'}
+ function chips(){const a=[...new Set(songs().map(s=>s.artist))].sort();
+  $('#fl').innerHTML=grp('Idioma',[['','Todos']].concat(LANGS),lang,'lg')+grp('Voz',[['','Todos']].concat(VOCES),voz,'vz')+grp('Artista',[['','Todos']].concat(a.map(x=>[x,x])),art,'a')}
+ function ytDraw(){const on=ytOn();$('#yb').hidden=!on;const b=$('#yt');b.hidden=!on;if(!on)return;
+  let h='<h3 style="font-size:16px;margin-bottom:8px">▶ Más karaokes en YouTube</h3>';
+  if(yt==null)h+='<p class="mut small">¿No está tu canción? Escribe el artista o el título arriba y pulsa «Buscar en YouTube».</p>';
+  else if(yt==='load')h+='<p class="mut">Buscando «'+esc(ytq)+'»…</p>';
+  else if(typeof yt==='string')h+='<p class="glow">'+esc(yt.slice(4))+'</p>';
+  else h+=yt.length?yt.map((r,i)=>'<div class="song">'+(r.th?'<img class="th" loading="lazy" alt="" src="'+esc(r.th)+'">':'')+'<div class="grow"><b>'+esc(cleanT(r.title))+'</b><div class="mut small">'+esc(r.ch)+'</div></div><button class="btn sm" data-y="'+i+'">'+ic('mic',16)+' Cantar</button>'+(cfg().premium?'<button class="btn neon sm" data-y="'+i+'" data-p="1">'+ic('crown',16)+' Prioridad Bs '+esc(cfg().price)+'</button>':'')+'</div>').join(''):'<p class="mut">Sin resultados para «'+esc(ytq)+'».</p>';
+  b.innerHTML=h}
+ async function doYt(){const t=$('#sq').value.trim();if(!t)return toast('Escribe un artista o una canción');ytq=t;yt='load';ytDraw();const my=++tok;
+  try{const r=await ytSearch(t+(voz==='duo'?' dueto':voz==='trio'?' trío':''),{lang:lang&&lang!=='xx'?lang:''});if(my===tok)yt=r}catch(e){if(my===tok)yt='err:'+ytErr(e)}
+  if(my===tok)ytDraw()}
+ function draw(){const c=cfg(),l=songs().filter(s=>(!art||s.artist===art)&&(!lang||lg(s)===lang)&&(!voz||vz(s)===voz)&&(!q||nz(s.title+' '+s.artist).includes(q)));
+  $('#st').textContent='★ Catálogo · '+l.length+(l.length===1?' canción':' canciones');
+  $('#sl').innerHTML=l.length?l.map((s,i)=>'<div class="song"><span class="rk">'+(i+1)+'</span><span class="av" style="background:'+grad(s.artist)+'">'+esc(String(s.artist||'?')[0])+'</span><div class="grow"><b>'+esc(s.title)+'</b><div class="mut small">'+esc(s.artist)+(lg(s)?' · '+esc(lab(LANGS,lg(s))):'')+(vz(s)?' · '+esc(lab(VOCES,vz(s))):'')+'</div></div>'+
+   '<button class="btn sm" data-id="'+esc(s.id)+'">'+ic('mic',16)+' Cantar</button>'+(c.premium?'<button class="btn neon sm" data-id="'+esc(s.id)+'" data-p="1" title="Pasa al frente de la cola">'+ic('crown',16)+' Prioridad Bs '+esc(c.price)+'</button>':'')+'</div>').join(''):'<p class="mut">'+(S.songs.length?'No hay resultados en el catálogo.'+(ytOn()?' Prueba «Buscar en YouTube».':' Pídele al encargado que la agregue.'):'El catálogo está vacío. Pídele al encargado que cargue canciones.')+'</p>';
   const w=waiting(),mine=S.queue.filter(x=>x.mesa==n&&x.status!=='done');
   $('#my').innerHTML=(mine.some(x=>x.status==='now')?'<div class="turn">'+ic('mic',22)+' ¡Es tu turno, sube al escenario!</div>':'')+'<h3 style="font-size:16px;margin-bottom:8px">Tus pedidos</h3>'+(mine.length?mine.map(x=>{let st='';if(x.status==='now')st='<span class="tag w">¡Es tu turno!</span>';else if(x.prio&&!x.paid)st='<span class="tag">Esperando pago</span>';else st='<span class="tag p">Posición '+(w.findIndex(y=>y.id===x.id)+1)+' · ~'+(4*(w.findIndex(y=>y.id===x.id)+1))+' min</span>';
    return '<div class="song"><div class="grow"><b>'+esc(x.title)+'</b><div class="mut small">'+esc(x.artist)+'</div></div>'+st+(x.status==='wait'?'<button class="btn ghost sm" data-del="'+x.id+'">Cancelar</button>':'')+'</div>'}).join(''):'<p class="mut small">Aún no has pedido canciones.</p>')}
  $('#my').onclick=e=>{const b=e.target.closest('[data-del]');if(b)store.del('queue',b.dataset.del)};
- view={upd(){chips();draw();const n=nowP();$('#np').innerHTML=n?'<div class="np"><span class="eq"><i></i><i></i><i></i><i></i></span><div><small class="mut">EN EL ESCENARIO · MESA '+esc(n.mesa)+'</small><br><b>'+esc(n.singer)+'</b> · '+esc(n.title)+'</div></div>':''}};view.upd()}
+ view={upd(){chips();draw();ytDraw();const n=nowP();$('#np').innerHTML=n?'<div class="np"><span class="eq"><i></i><i></i><i></i><i></i></span><div><small class="mut">EN EL ESCENARIO · MESA '+esc(n.mesa)+'</small><br><b>'+esc(n.singer)+'</b> · '+esc(n.title)+'</div></div>':''}};view.upd()}
 
 /* ---------- pantalla principal ---------- */
 function pantalla(){const A=$('#app');let cur='',seen=new Set(),t0=Date.now();
  A.innerHTML='<div class="tv"><main id="main"></main><aside id="side" class="stack"></aside></div><div class="ck" id="ck"></div><div class="tick"><span id="tk"></span></div><div class="camw" id="cw"><video id="cam" autoplay muted playsinline></video><b>● EN VIVO</b></div><button class="btn ghost sm" id="cb" style="position:fixed;left:12px;bottom:92px;display:none">Activar cámara</button>'+
- '<button class="btn ghost sm" id="fs" style="position:fixed;left:12px;bottom:48px">Pantalla completa</button>';
- $('#fs').onclick=()=>{try{document.documentElement.requestFullscreen()}catch(e){};$('#fs').remove()};
+ '<button class="btn ghost sm" id="fs" style="position:fixed;left:12px;bottom:48px">Pantalla completa</button><button class="btn ghost sm" id="xc">✕ Salir de pantalla completa</button>';
+ let cine=false,mvT;
+ const wake=()=>{document.body.classList.add('mv');clearTimeout(mvT);mvT=setTimeout(()=>document.body.classList.remove('mv'),3000)};
+ addEventListener('mousemove',wake);addEventListener('touchstart',wake);
+ function cineOff(){cine=false;document.body.classList.remove('cine-on');const v=$('#vd');if(v)v.classList.remove('cine');document.querySelectorAll('.lt').forEach(x=>x.remove())}
+ function cineOn(n){if(!cfg().fsAuto)return;const v=$('#vd');if(!v||!$('#vd iframe'))return;cine=true;v.classList.add('cine');document.body.classList.add('cine-on');wake();
+  try{if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{})}catch(e){}
+  const l=document.createElement('div');l.className='lt';l.innerHTML='<small>MESA '+esc(n.mesa)+'</small><br><b>'+esc(n.singer)+'</b> · '+esc(n.title);document.body.appendChild(l);setTimeout(()=>l.remove(),8000)}
+ $('#xc').onclick=()=>{cineOff();try{if(document.fullscreenElement)document.exitFullscreen()}catch(e){}};
+ $('#fs').onclick=()=>{try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}catch(e){}};
+ document.onfullscreenchange=()=>{const f=$('#fs');if(f)f.style.display=document.fullscreenElement?'none':''};
  let camOn=false;const clock=()=>{const k=$('#ck');if(k)k.textContent=new Date().toLocaleTimeString('es-BO',{hour:'2-digit',minute:'2-digit'})};clock();setInterval(clock,1000);
  $('#cb').onclick=()=>navigator.mediaDevices.getUserMedia({video:{width:640,height:480,facingMode:'user'},audio:false}).then(st=>{$('#cam').srcObject=st;camOn=true;view.upd()}).catch(()=>toast('No se pudo abrir la cámara'));
  function camUi(n){const c=cfg(),cw=$('#cw'),cb=$('#cb');cw.className='camw pos-'+c.camPos;cw.style.display=(c.cam&&camOn&&n)?'block':'none';cb.style.display=(c.cam&&!camOn)?'inline-flex':'none';if(!c.cam&&camOn){const st=$('#cam').srcObject;st&&st.getTracks().forEach(t=>t.stop());$('#cam').srcObject=null;camOn=false}}
  window.onmessage=e=>{if(!/youtube/.test(e.origin))return;let d;try{d=JSON.parse(e.data)}catch(x){return}
   if(d&&d.event==='onStateChange'&&d.info===0&&cfg().auto)next();
-  if(d&&d.event==='onError'){const n=nowP();if(n){const s=S.songs.find(x=>x.id===n.songId);if(s&&!s.bad)store.set('songs',s.id,Object.assign({},s,{bad:true}));
+  if(d&&d.event==='onError'){cineOff();const n=nowP();if(n){const s=S.songs.find(x=>x.id===n.songId);if(s&&!s.bad)store.set('songs',s.id,Object.assign({},s,{bad:true}));
    const v=$('#vd');if(v&&!$('#vw'))v.insertAdjacentHTML('afterend','<p id="vw" class="glow" style="margin:10px 0 0">Este video no permite reproducirse en otras páginas. Pulsa «Mirar en YouTube» o elige una versión karaoke.</p>')}}};
  view={upd(){const n=nowP(),c=cfg(),w=waiting();camUi(n);const tk=$('#tk');if(tk){const t=w.length?w.map(x=>x.singer+' — '+x.title).join('     ♪     '):'Escanea el QR y pide tu canción';tk.textContent=t+'     ♪     '+t}
   S.claps.filter(k=>!seen.has(k.id)&&k.ts>=t0-5000).forEach(k=>{seen.add(k.id);burst(k);store.del('claps',k.id)});
   if(n){const id=ytId(n.video);
-   if(cur!==n.id){cur=n.id;$('#main').innerHTML='<div class="vid" id="vd">'+(id?'<iframe title="Video" allow="autoplay; encrypted-media; fullscreen" data-src="https://www.youtube-nocookie.com/embed/'+id+'?autoplay=1&enablejsapi=1&rel=0&origin='+encodeURIComponent(location.origin)+'"></iframe>':'<div class="idle" style="height:100%;border:0"><div><h2 class="glow">Sin video</h2><p class="mut">Esta canción no tiene enlace de YouTube. Usa «Siguiente» en el panel.</p></div></div>')+'</div><div class="now" id="nw"></div><div class="mut" id="ns"></div><p><span class="eq"><i></i><i></i><i></i><i></i></span> <b id="cc">0 aplausos</b></p><p class="small"><a id="yl" target="_blank" rel="noopener" style="color:var(--brass)"></a></p>';
-    const f=$('#vd iframe');if(f)f.onload=()=>{try{f.contentWindow.postMessage(JSON.stringify({event:'listening',id:1,channel:'widget'}),'*')}catch(x){}};cc=0;announce(n);if(f){const my=n.id;setTimeout(()=>{if(cur===my)f.src=f.dataset.src},3800)}}
+   if(cur!==n.id){cur=n.id;cineOff();$('#main').innerHTML='<div class="vid" id="vd">'+(id?'<iframe title="Video" allow="autoplay; encrypted-media; fullscreen" data-src="https://www.youtube-nocookie.com/embed/'+id+'?autoplay=1&enablejsapi=1&rel=0&origin='+encodeURIComponent(location.origin)+'"></iframe>':'<div class="idle" style="height:100%;border:0"><div><h2 class="glow">Sin video</h2><p class="mut">Esta canción no tiene enlace de YouTube. Usa «Siguiente» en el panel.</p></div></div>')+'</div><div class="now" id="nw"></div><div class="mut" id="ns"></div><p><span class="eq"><i></i><i></i><i></i><i></i></span> <b id="cc">0 aplausos</b></p><p class="small"><a id="yl" target="_blank" rel="noopener" style="color:var(--brass)"></a></p>';
+    const f=$('#vd iframe');if(f)f.onload=()=>{try{f.contentWindow.postMessage(JSON.stringify({event:'listening',id:1,channel:'widget'}),'*')}catch(x){}};cc=0;announce(n);if(f){const my=n.id;setTimeout(()=>{if(cur===my){f.src=f.dataset.src;cineOn(n)}},3800)}}
    $('#nw').textContent=n.title;$('#ns').textContent=n.artist+' · canta '+n.singer+' (mesa '+n.mesa+')';const yl=$('#yl');yl.href=id?'https://www.youtube.com/watch?v='+id:'https://www.youtube.com/results?search_query='+encodeURIComponent(n.title+' '+n.artist+' karaoke');yl.textContent=id?'¿No carga el video? Ábrelo en YouTube':'Buscar karaoke de esta canción en YouTube'}
-  else{cur='';const top={};S.queue.filter(q=>q.status==='done').forEach(q=>top[q.singer]=(top[q.singer]||0)+1);const t=Object.entries(top).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  else{cur='';cineOff();const top={};S.queue.filter(q=>q.status==='done').forEach(q=>top[q.singer]=(top[q.singer]||0)+1);const t=Object.entries(top).sort((a,b)=>b[1]-a[1]).slice(0,5);
    $('#main').innerHTML='<h1>'+esc(c.bar)+'</h1><div class="idle" style="margin-top:16px"><div>'+vinyl(140)+'<h2 class="glow" style="font-size:clamp(26px,4vw,52px)">Escanea el QR de tu mesa</h2><p class="mut">Elige tu canción desde el celular y sube al escenario.</p>'+(t.length?'<p style="margin-top:18px"><b>Más cantores de la noche</b><br>'+t.map(x=>esc(x[0])+' ('+x[1]+')').join(' · ')+'</p>':'')+'</div></div>'}
   $('#side').innerHTML='<div class="card"><h3 style="font-size:18px;color:var(--brass)">Próximos</h3>'+(w.length?w.slice(0,6).map((x,i)=>'<div class="song"><span class="tag '+(x.prio?'p':'')+'">'+(i+1)+'</span><div class="grow"><b>'+esc(x.singer)+'</b><div class="mut small">'+esc(x.title)+' · '+esc(x.artist)+'</div></div></div>').join(''):'<p class="mut">La cola está libre. ¡Anímate a pedir!</p>')+'</div><div class="card" style="text-align:center">'+qrSvg(root())+'<p class="small mut" style="margin:6px 0 0">Escanea y pide tu canción</p></div>'}};view.upd()}
 
 /* ---------- panel de control ---------- */
+function guiaOperador(){const li=t=>'<li><span>'+t+'</span></li>';
+ return '<div class="card"><h3 style="font-size:18px">Guía rápida del operador</h3>'+
+ '<h3 class="sec">Antes de abrir el local</h3><ol class="steps">'+
+ li('Abre <b>pantalla.html</b> en el televisor o proyector y pulsa <b>Pantalla completa</b> una sola vez. Desde ahí, cada video se pone a pantalla completa solo, justo después de presentar al cantante. Si el navegador no lo permite, usa F11.')+
+ li('En <b>Catálogo</b> toca <b>Cargar los 20 temas</b> o agrega los tuyos. Elige idioma y voz (hombre, mujer, dúo, trío): con eso los clientes filtran.')+
+ li('Pega el enlace de YouTube de cada tema y toca <b>Guardar video</b>. Sabrás que se guardó porque aparece «✓ ¡Guardado!» y la canción queda con la etiqueta verde «✓ Video guardado». Sin esa etiqueta, la canción no tiene video.')+
+ li('En <b>Buscar karaoke</b> busca por artista o título, prueba el video y toca <b>Agregar al catálogo</b>.')+
+ li('En <b>Mesas y QR</b> imprime los QR y pégalos en cada mesa.')+'</ol>'+
+ '<h3 class="sec">Durante la noche</h3><ol class="steps">'+
+ li('En <b>Cola</b>, los pedidos con prioridad esperan en «Prioridad por confirmar pago». Cobra y toca <b>Confirmar pago</b>.')+
+ li('El siguiente cantante entra solo cuando termina el video. Si hace falta, toca <b>Siguiente</b>.')+
+ li('Si un video no carga (bloqueado fuera de YouTube), ve a Catálogo, toca <b>Buscar video</b>, elige otro y guárdalo.')+
+ li('Para salir de la pantalla completa en el televisor, toca o mueve el mouse y pulsa «Salir de pantalla completa».')+'</ol>'+
+ '<h3 class="sec">Crear la clave de búsqueda de YouTube (gratis)</h3><ol class="steps">'+
+ li('Entra a <b>console.cloud.google.com</b> y crea un proyecto.')+
+ li('En «APIs y servicios» activa <b>YouTube Data API v3</b>.')+
+ li('En «Credenciales» crea una <b>clave de API</b>.')+
+ li('Restríngela a tu sitio web (tu dominio) y solo a YouTube Data API v3.')+
+ li('Pégala en <b>Ajustes</b> y guarda. Los clientes también podrán buscar desde su celular.')+'</ol>'+
+ '<p class="small mut">Cada búsqueda gasta 100 unidades de la cuota diaria gratuita (por defecto 10 000, unas 100 búsquedas al día entre todos). Si se agota, el catálogo sigue funcionando.</p></div>'}
+
 function panel(){const A=$('#app');
  if(!isAdmin&&sessionStorageOK('rk_ok')!=='1'){A.innerHTML=head('Panel')+'<div class="wrap"><div class="card stack"><h3>Ingresa el PIN</h3><input id="pin" type="password" inputmode="numeric" aria-label="PIN"><button class="btn" id="ok">Entrar</button><p class="small mut">PIN inicial: 1234. Cámbialo en Ajustes.</p></div></div>';
   $('#ok').onclick=()=>{if($('#pin').value===cfg().pin){sessionStorageOK('rk_ok','1');panel()}else toast('PIN incorrecto')};view={upd(){}};return}
- const T={cola:'Cola',cat:'Catálogo',qr:'Mesas y QR',aj:'Ajustes'};let tab='cola',cur;
+ const T={cola:'Cola',cat:'Catálogo',yt:'Buscar karaoke',qr:'Mesas y QR',aj:'Ajustes',gd:'Guía'};let tab='cola',cur,sig='',yres=null;
  A.innerHTML=head(cfg().bar+' · panel','<a class="btn ghost sm" href="pantalla.html" target="_blank">Abrir pantalla</a>')+'<div class="wrap"><div class="tabs" id="tb">'+Object.entries(T).map(([k,v])=>'<button class="chip" data-t="'+k+'">'+v+'</button>').join('')+'</div><div id="pb"></div></div>';
  $('#tb').onclick=e=>{const b=e.target.closest('[data-t]');if(b){tab=b.dataset.t;show()}};
  const tabs={
@@ -244,18 +337,51 @@ function panel(){const A=$('#app');
   upd(){const n=nowP(),w=waiting(),h=held();$('#pc').innerHTML=stats()+'<div class="card"><div class="row"><div class="grow"><span class="mut small">Sonando ahora</span><h3 style="font-size:18px">'+(n?esc(n.title):'Nadie en el escenario')+'</h3>'+(n?'<div class="mut small">'+esc(n.artist)+' · '+esc(n.singer)+' (mesa '+n.mesa+')</div>':'')+'</div><button class="btn neon" data-a="next">Siguiente</button></div></div>'+
    (h.length?'<div class="card"><h3 style="font-size:16px">Prioridad por confirmar pago</h3>'+h.map(x=>'<div class="song"><div class="grow"><b>'+esc(x.title)+'</b><div class="mut small">Mesa '+x.mesa+' · '+esc(x.singer)+' · Bs '+esc(cfg().price)+'</div></div><button class="btn sm" data-a="pay" data-id="'+x.id+'">Confirmar pago</button><button class="btn ghost sm" data-a="rm" data-id="'+x.id+'">Quitar</button></div>').join('')+'</div>':'')+
    '<div class="card"><h3 style="font-size:16px">En espera ('+w.length+')</h3>'+(w.length?w.map((x,i)=>'<div class="song"><span class="tag '+(x.prio?'p':'')+'">'+(i+1)+'</span><div class="grow"><b>'+esc(x.title)+'</b><div class="mut small">'+esc(x.artist)+' · mesa '+x.mesa+' · '+esc(x.singer)+'</div></div><button class="btn ghost sm" data-a="rm" data-id="'+x.id+'">Quitar</button></div>').join(''):'<p class="mut small">No hay pedidos en espera.</p>')+'</div><button class="btn ghost sm" data-a="clean">Limpiar historial</button>'}},
- cat:{mount(){$('#pb').innerHTML='<div class="card stack"><h3 style="font-size:16px">Agregar canción</h3><input id="t" placeholder="Título"><input id="a" placeholder="Intérprete"><input id="v" placeholder="Enlace de YouTube (opcional)"><div class="row"><button class="btn" id="add">Agregar</button><button class="btn ghost" id="demo">Cargar los 20 temas</button><button class="btn ghost" id="vf">Verificar videos</button></div></div><div class="card" id="sl" style="margin-top:12px"></div>';
+ cat:{mount(){sig='';$('#pb').innerHTML='<div class="card stack"><h3 style="font-size:16px">Agregar canción</h3><input id="t" placeholder="Título"><input id="a" placeholder="Intérprete"><input id="v" placeholder="Enlace de YouTube (opcional)"><div class="row"><select id="l1" aria-label="Idioma">'+opts(LANGS,'es')+'</select><select id="v1" aria-label="Voz">'+opts(VOCES,'','Voz sin definir')+'</select></div><div class="row"><button class="btn" id="add">Agregar</button><button class="btn ghost" id="demo">Cargar los 20 temas</button><button class="btn ghost" id="vf">Verificar videos</button></div></div><div class="card" id="sl" style="margin-top:12px"></div>';
    $('#add').onclick=()=>{const t=$('#t').value.trim(),a=$('#a').value.trim(),v=$('#v').value.trim();if(!t||!a)return toast('Escribe título e intérprete');if(v&&!ytId(v))return toast('El enlace de YouTube no es válido');
-    store.set('songs',uid('s'),{title:t,artist:a,video:ytId(v)});$('#t').value=$('#a').value=$('#v').value='';toast('Canción agregada')};
+    const id=uid('s'),bt=$('#add');bt.disabled=true;Promise.resolve(store.set('songs',id,{title:t,artist:a,video:ytId(v),lang:$('#l1').value,voz:$('#v1').value})).then(ok=>{bt.disabled=false;if(ok===false)return;$('#t').value=$('#a').value=$('#v').value='';mark(id);toast('✓ Canción guardada en el catálogo: '+t)})};
    $('#demo').onclick=()=>seedAll(true);$('#vf').onclick=verify;
-   $('#sl').onclick=e=>{const sv=e.target.closest('[data-sv]');if(sv){const inp=$('[data-vi="'+sv.dataset.sv+'"]'),id=ytId(inp.value),song=S.songs.find(x=>x.id===sv.dataset.sv);if(!id)return toast('Enlace de YouTube no válido');store.set('songs',song.id,Object.assign({},song,{video:id,bad:false}));toast('Video guardado');return}const b=e.target.closest('[data-rm]');if(b)store.del('songs',b.dataset.rm)}},
-  upd(){if(S._l&&S._l.songs&&!S.songs.length&&!window._sd){window._sd=1;seedAll()}$('#sl').innerHTML=S.songs.length?S.songs.slice().sort((a,b)=>a.artist.localeCompare(b.artist)).map(s=>'<div class="song"><div class="grow"><b>'+esc(s.title)+'</b><div class="mut small">'+esc(s.artist)+' · '+(s.video?'con video':'sin video')+(s.bad?' · ⚠ bloqueado para web, pega otro video':'')+'</div></div>'+(s.video?'<a class="btn ghost sm" target="_blank" rel="noopener" href="https://www.youtube.com/watch?v='+esc(s.video)+'">Probar</a>':'')+'<a class="btn ghost sm" target="_blank" rel="noopener" href="https://www.youtube.com/results?search_query='+encodeURIComponent(s.title+' '+s.artist+' karaoke')+'">Buscar video</a><button class="btn ghost sm" data-rm="'+s.id+'">Borrar</button><input data-vi="'+s.id+'" placeholder="Pegar enlace de YouTube" style="flex:1 1 160px" aria-label="Enlace de YouTube"><button class="btn sm" data-sv="'+s.id+'">Guardar video</button></div>').join(''):'<p class="mut">Catálogo vacío. Agrega canciones o carga los ejemplos.</p>'}},
+   function saveVideo(song,id,btn){btn.disabled=true;btn.textContent='Guardando…';const w=setTimeout(()=>toast('Aún sin confirmar. Revisa tu conexión a internet.'),8000);
+    Promise.resolve(store.set('songs',song.id,Object.assign({},song,{video:id,bad:false}))).then(ok=>{clearTimeout(w);if(ok===false){btn.disabled=false;btn.textContent='Guardar video';return}mark(song.id);toast('✓ Video guardado: '+song.title)})}
+   $('#sl').onclick=e=>{const sv=e.target.closest('[data-sv]');if(sv){const inp=$('[data-vi="'+sv.dataset.sv+'"]'),id=ytId(inp.value),song=S.songs.find(x=>x.id===sv.dataset.sv);if(!id)return toast('Enlace de YouTube no válido');saveVideo(song,id,sv);return}
+    const b=e.target.closest('[data-rm]');if(b){const s=S.songs.find(x=>x.id===b.dataset.rm);if(s&&confirm('¿Borrar «'+s.title+'» del catálogo?'))store.del('songs',s.id)}};
+   $('#sl').onkeydown=e=>{if(e.key==='Enter'&&e.target.dataset.vi){const b=$('[data-sv="'+e.target.dataset.vi+'"]');if(b)b.click()}};
+   $('#sl').onchange=e=>{const el=e.target,k=el.dataset.lg?'lang':el.dataset.vz?'voz':'';if(!k)return;const id=el.dataset.lg||el.dataset.vz,song=S.songs.find(x=>x.id===id);if(!song)return;
+    const nu=Object.assign({},song,{lang:lg(song),voz:vz(song)});nu[k]=el.value;Promise.resolve(store.set('songs',id,nu)).then(ok=>{if(ok!==false)toast('✓ Guardado: '+song.title)})}},
+  upd(){if(S._l&&S._l.songs&&!S.songs.length&&!window._sd){window._sd=1;seedAll()}
+   const g=S.songs.map(s=>[s.id,s.title,s.artist,s.video,s.bad,lg(s),vz(s)].join('~')).join('|')+'#'+Object.keys(S._sv||{}).join();if(g===sig)return;sig=g;
+   $('#sl').innerHTML=S.songs.length?S.songs.slice().sort((a,b)=>a.artist.localeCompare(b.artist)).map(s=>{const fr=S._sv&&S._sv[s.id];return '<div class="song'+(fr?' flash':'')+'"><div class="grow"><b>'+esc(s.title)+'</b><div class="mut small">'+esc(s.artist)+'</div></div>'+
+    (s.bad?'<span class="tag w" title="Este video no se puede reproducir en otras páginas. Pega otro.">⚠ Video bloqueado</span>':s.video?'<span class="tag ok">'+(fr?'✓ ¡Guardado!':'✓ Video guardado')+'</span>':'<span class="tag">'+(fr?'✓ ¡Guardada! · ':'')+'Sin video</span>')+
+    '<select data-lg="'+s.id+'" aria-label="Idioma">'+opts(LANGS,lg(s),'Idioma ?')+'</select><select data-vz="'+s.id+'" aria-label="Voz">'+opts(VOCES,vz(s),'Voz ?')+'</select>'+
+    (s.video?'<a class="btn ghost sm" target="_blank" rel="noopener" href="https://www.youtube.com/watch?v='+esc(s.video)+'">Probar</a>':'')+'<a class="btn ghost sm" target="_blank" rel="noopener" href="https://www.youtube.com/results?search_query='+encodeURIComponent(s.title+' '+s.artist+' karaoke')+'">Buscar video</a><button class="btn ghost sm" data-rm="'+s.id+'">Borrar</button><input data-vi="'+s.id+'" placeholder="Pegar enlace de YouTube" style="flex:1 1 160px" aria-label="Enlace de YouTube"><button class="btn sm" data-sv="'+s.id+'">Guardar video</button></div>'}).join(''):'<p class="mut">Catálogo vacío. Agrega canciones o carga los ejemplos.</p>'}},
+ yt:{mount(){sig='';const c=cfg();$('#pb').innerHTML=(c.ytKey?'':'<div class="card" style="border-color:var(--neon);margin-bottom:12px"><b>Falta la clave de YouTube</b><p class="small mut" style="margin:6px 0 0">Sin ella no se puede buscar aquí. Mientras tanto usa «Abrir en YouTube», copia el enlace del video y pégalo en Catálogo. La pestaña Guía explica cómo crear la clave (es gratis).</p></div>')+
+   '<div class="card stack"><h3 style="font-size:16px">Buscar karaoke nuevo</h3><input id="ya" placeholder="Artista (ej. Los Bukis)" aria-label="Artista"><input id="ytt" placeholder="Canción (opcional)" aria-label="Canción"><div class="row"><select id="yl" aria-label="Idioma">'+opts(LANGS,'es')+'</select><select id="yv" aria-label="Voz">'+opts(VOCES,'','Voz sin definir')+'</select></div><div class="row"><button class="btn" id="ys">Buscar</button><a class="btn ghost" id="yo" target="_blank" rel="noopener">Abrir en YouTube</a></div><p class="small mut" style="margin:0">El idioma y la voz se aplican a las canciones que agregues.</p></div><div class="card" id="yr" style="margin-top:12px"></div>';
+   const qs=()=>($('#ya').value.trim()+' '+$('#ytt').value.trim()).trim();
+   const go=async()=>{const qq=qs();if(!qq)return toast('Escribe un artista o una canción');if(!cfg().ytKey)return toast('Falta la clave de YouTube en Ajustes');yres='load';sig='';cur.upd();
+    try{yres=await ytSearch(qq,{lang:$('#yl').value&&$('#yl').value!=='xx'?$('#yl').value:''});yres.q=qq}catch(e){yres='err:'+ytErr(e)}sig='';cur.upd()};
+   $('#ys').onclick=go;$('#ya').onkeydown=$('#ytt').onkeydown=e=>{if(e.key==='Enter')go()};
+   $('#yo').onclick=e=>{e.currentTarget.href='https://www.youtube.com/results?search_query='+encodeURIComponent((qs()||'karaoke')+' karaoke')};
+   $('#yr').onclick=e=>{const b=e.target.closest('[data-add]');if(!b)return;const i=+b.dataset.add,x=yres[i],t=$('[data-ti="'+i+'"]').value.trim(),a=$('[data-ai="'+i+'"]').value.trim();if(!t||!a)return toast('Escribe título e intérprete');
+    const id=uid('s');b.disabled=true;b.textContent='Guardando…';Promise.resolve(store.set('songs',id,{title:t,artist:a,video:x.id,lang:$('#yl').value,voz:$('#yv').value})).then(ok=>{if(ok===false){b.disabled=false;b.textContent='Agregar al catálogo';return}mark(id);toast('✓ Agregada al catálogo: '+t)})}},
+  upd(){const r=$('#yr');if(!r)return;const g=(Array.isArray(yres)?yres.map(x=>x.id).join():String(yres))+'|'+S.songs.length+'|'+Object.keys(S._sv||{}).join();if(g===sig)return;sig=g;
+   if(yres==null)r.innerHTML='<p class="mut small">Escribe un artista o una canción y pulsa Buscar. Se buscan videos de karaoke que permiten reproducirse en la pantalla.</p>';
+   else if(yres==='load')r.innerHTML='<p class="mut">Buscando…</p>';
+   else if(typeof yres==='string')r.innerHTML='<p class="glow">'+esc(yres.slice(4))+'</p>';
+   else{const have=new Set(S.songs.map(s=>s.video)),art=$('#ya')?$('#ya').value.trim():'';r.innerHTML=yres.length?yres.map((x,i)=>'<div class="song">'+(x.th?'<img class="th" loading="lazy" alt="" src="'+esc(x.th)+'">':'')+'<div class="grow"><b>'+esc(x.title)+'</b><div class="mut small">'+esc(x.ch)+'</div></div><a class="btn ghost sm" target="_blank" rel="noopener" href="https://www.youtube.com/watch?v='+esc(x.id)+'">Probar</a>'+
+     (have.has(x.id)?'<span class="tag ok">✓ En el catálogo</span>':'<input data-ti="'+i+'" value="'+esc(cleanT(x.title))+'" style="flex:1 1 150px" aria-label="Título"><input data-ai="'+i+'" value="'+esc(art)+'" placeholder="Intérprete" style="flex:1 1 120px" aria-label="Intérprete"><button class="btn sm" data-add="'+i+'">Agregar al catálogo</button>')+'</div>').join(''):'<p class="mut">Sin resultados. Prueba con otro artista o escribe el título.</p>'}}},
+
  qr:{mount(){const c=cfg();$('#pb').innerHTML='<div class="row" style="margin-bottom:12px"><input id="nmz" type="number" min="1" max="60" value="'+esc(c.mesas)+'" aria-label="Cantidad de mesas"><button class="btn" id="gen">Generar QR</button><button class="btn ghost" onclick="print()">Imprimir</button></div><div class="qrs" id="qg"></div><p class="small mut">Cada QR abre la rockola ya ubicada en su mesa.</p>';
    const g=()=>{const k=Math.min(60,Math.max(1,parseInt($('#nmz').value)||1));$('#qg').innerHTML=Array.from({length:k},(_,i)=>'<div class="card">'+qrSvg(root()+'?mesa='+(i+1))+'<b>Mesa '+(i+1)+'</b></div>').join('')};$('#gen').onclick=g;g()},upd(){}},
  aj:{mount(){const c=cfg();$('#pb').innerHTML='<div class="card stack"><label>Nombre del local<input id="s1" value="'+esc(c.bar)+'"></label><label>Pedidos máximos por mesa<input id="s2" type="number" min="1" value="'+esc(c.max)+'"></label><label>Cantidad de mesas<input id="s3" type="number" min="1" value="'+esc(c.mesas)+'"></label>'+
    '<label class="row"><input type="checkbox" id="s4" style="width:auto"'+(c.premium?' checked':'')+'> Activar versión premium (prioridad pagada)</label><label>Precio de la prioridad (Bs)<input id="s5" type="number" min="0" value="'+esc(c.price)+'"></label>'+
-   '<label class="row"><input type="checkbox" id="s6" style="width:auto"'+(c.auto?' checked':'')+'> Pasar al siguiente cuando termine el video</label><label class="row"><input type="checkbox" id="s8" style="width:auto"'+(c.cam?' checked':'')+'> Mostrar la cámara del cantante en la pantalla</label><label>Posición de la cámara<select id="s9">'+[['br','Abajo derecha'],['bl','Abajo izquierda'],['tr','Arriba derecha'],['tl','Arriba izquierda']].map(o=>'<option value="'+o[0]+'"'+(c.camPos===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select></label><label>PIN del panel<input id="s7" value="'+esc(c.pin)+'"></label><button class="btn" id="sv">Guardar ajustes</button></div>';
-   $('#sv').onclick=()=>{store.set('cfg','main',{bar:$('#s1').value.trim()||DEF.bar,max:+$('#s2').value||3,mesas:+$('#s3').value||12,premium:$('#s4').checked,price:+$('#s5').value||0,auto:$('#s6').checked,cam:$('#s8').checked,camPos:$('#s9').value,pin:$('#s7').value.trim()||'1234'});toast('Ajustes guardados')}},upd(){}}};
+   '<label class="row"><input type="checkbox" id="s6" style="width:auto"'+(c.auto?' checked':'')+'> Pasar al siguiente cuando termine el video</label>'+
+   '<label class="row"><input type="checkbox" id="s12" style="width:auto"'+(c.fsAuto?' checked':'')+'> Poner el video en pantalla completa después de presentar al cantante</label>'+
+   '<label class="row"><input type="checkbox" id="s8" style="width:auto"'+(c.cam?' checked':'')+'> Mostrar la cámara del cantante en la pantalla</label><label>Posición de la cámara<select id="s9">'+[['br','Abajo derecha'],['bl','Abajo izquierda'],['tr','Arriba derecha'],['tl','Arriba izquierda']].map(o=>'<option value="'+o[0]+'"'+(c.camPos===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select></label>'+
+   '<label class="row"><input type="checkbox" id="s11" style="width:auto"'+(c.ytClient!==false?' checked':'')+'> Permitir que los clientes busquen karaokes en YouTube</label><label>Clave de YouTube Data API<input id="s10" value="'+esc(c.ytKey)+'" placeholder="AIza…" autocomplete="off"></label><p class="small mut" style="margin:0">Sirve para buscar karaokes nuevos. La pestaña Guía explica cómo crearla. Restríngela a tu dominio en Google Cloud, porque los clientes la usan desde su celular.</p>'+
+   '<label>PIN del panel<input id="s7" value="'+esc(c.pin)+'"></label><button class="btn" id="sv">Guardar ajustes</button></div>';
+   $('#sv').onclick=()=>{const b=$('#sv');b.disabled=true;Promise.resolve(store.set('cfg','main',{bar:$('#s1').value.trim()||DEF.bar,max:+$('#s2').value||3,mesas:+$('#s3').value||12,premium:$('#s4').checked,price:+$('#s5').value||0,auto:$('#s6').checked,fsAuto:$('#s12').checked,cam:$('#s8').checked,camPos:$('#s9').value,ytClient:$('#s11').checked,ytKey:$('#s10').value.trim(),pin:$('#s7').value.trim()||'1234'})).then(ok=>{b.disabled=false;if(ok!==false)toast('✓ Ajustes guardados')})}},upd(){}},
+ gd:{mount(){$('#pb').innerHTML=guiaOperador()},upd(){}}};
+
  function show(){cur=tabs[tab];[...$('#tb').children].forEach(b=>b.classList.toggle('on',b.dataset.t===tab));cur.mount();cur.upd()}
  view={upd(){if(cur)cur.upd()}};show()}
 function sessionStorageOK(k,v){try{if(v!==undefined)sessionStorage.setItem(k,v);return sessionStorage.getItem(k)}catch(e){return window['_'+k]=v!==undefined?v:window['_'+k]}}

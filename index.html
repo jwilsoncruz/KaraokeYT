@@ -132,6 +132,8 @@ body[data-p="panel"]{--brass:#7fe0c3;--neon:#4fb3ff}
 body.cine-on #xc{display:inline-flex}body.cine-on.mv #xc{opacity:1}
 .lt{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:13;max-width:80vw;padding:12px 20px;border-radius:12px;background:rgba(10,3,8,.74);backdrop-filter:blur(6px);border-left:4px solid var(--neon);color:#fff;font-size:clamp(16px,2.2vw,28px);animation:ltout .6s 7s forwards;pointer-events:none}
 @keyframes ltout{to{opacity:0;visibility:hidden}}
+#off{position:fixed;left:50%;top:calc(8px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:40;padding:8px 16px;border-radius:99px;background:var(--neon);color:#fff;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.4);max-width:92vw;text-align:center}
+#off.back{background:var(--ok);color:#06241a}
 </style>
 </head>
 <body data-p="cliente">
@@ -141,8 +143,9 @@ body.cine-on #xc{display:inline-flex}body.cine-on.mv #xc{opacity:1}
 <script>
 const DEF={bar:'Rockola Karaoke',premium:true,price:5,max:3,pin:'1234',auto:true,mesas:12,cam:false,camPos:'br',fsAuto:true,ytKey:'',ytClient:true,ytLim:5};
 const S={songs:[],queue:[],cfg:[],claps:[]};
-const VER='1.4';
-const LOG=[['1.4','19 nov 2026',['Límite de búsquedas de YouTube por celular y por hora (se cambia en Ajustes) y memoria de búsquedas repetidas, para cuidar la cuota diaria.','Tope de aplausos por celular para no gastar lecturas de Firebase.','Estado visible en la Cola: nube conectada o modo local, aviso si el PIN sigue en 1234 o falta la clave de YouTube.','La pantalla evita que el televisor se apague durante las canciones.']],
+const VER='1.5';
+const LOG=[['1.5','19 nov 2026',['Aviso «Sin conexión» en el televisor, el panel y los celulares, y «Conexión recuperada» al volver.','Al volver el internet, la pantalla intenta reanudar el video donde iba.','Si un cliente pide una canción sin conexión, la app le avisa que se enviará cuando vuelva el internet.']],
+['1.4','19 nov 2026',['Límite de búsquedas de YouTube por celular y por hora (se cambia en Ajustes) y memoria de búsquedas repetidas, para cuidar la cuota diaria.','Tope de aplausos por celular para no gastar lecturas de Firebase.','Estado visible en la Cola: nube conectada o modo local, aviso si el PIN sigue en 1234 o falta la clave de YouTube.','La pantalla evita que el televisor se apague durante las canciones.']],
 ['1.3','19 nov 2026',['Nuevo botón «Versión rockola»: busca la canción original en YouTube solo para escuchar y ver en la pantalla.','Los pedidos rockola se marcan con 🎵 en la cola, la pantalla y el panel, y se presentan sin «subir al escenario».']],
 ['1.2','19 nov 2026',['Botones separados: «Buscar en el catálogo» y «Buscar en YouTube».','Los resultados de YouTube salen justo debajo del buscador.','Número de versión visible y lista de novedades en la Guía.']],
 ['1.1','19 nov 2026',['Filtros por idioma y voz (hombre, mujer, dúo, trío) en el cliente.','Pantalla completa automática del video después de presentar al cantante.','Aviso «✓ Video guardado» en el catálogo.','Guía rápida para clientes y para el operador.','Búsqueda de karaokes nuevos en YouTube (panel y cliente).']],
@@ -226,7 +229,7 @@ function request(song,mesa,singer,prio,modo){
  const c=cfg(),mine=S.queue.filter(q=>q.mesa==mesa&&q.status==='wait').length;
  if(mine>=c.max)return toast('Esta mesa ya tiene '+c.max+' pedidos en espera');
  store.set('queue',uid('q'),{songId:song.id,title:song.title,artist:song.artist,video:song.video||'',singer:singer||('Mesa '+mesa),mesa:+mesa,prio:!!prio,paid:false,modo:modo?'rockola':'',status:'wait',ts:Date.now()});
- toast(modo?'Pedido enviado. ¡Atento a la pantalla!':prio?'Pedido enviado. Paga en caja para activar la prioridad':'Pedido enviado. ¡Prepárate para cantar!')}
+ toast(window._off?'Sin conexión: tu pedido se enviará cuando vuelva el internet.':modo?'Pedido enviado. ¡Atento a la pantalla!':prio?'Pedido enviado. Paga en caja para activar la prioridad':'Pedido enviado. ¡Prepárate para cantar!')}
 function next(){const n=nowP();if(n)upd(n,{status:'done',doneAt:Date.now()});const w=waiting()[0];if(w)upd(w,{status:'now',startAt:Date.now()})}
 function qrSvg(t){try{const q=qrcode(0,'M');q.addData(t);q.make();return q.createSvgTag(4,2)}catch(e){return '<p class="small mut">'+esc(t)+'</p>'}}
 const base=()=>location.href.split('#')[0];
@@ -290,7 +293,8 @@ function mesa(n){const A=$('#app');let q='',art='',lang='',voz='',yt=null,ytq=''
 function pantalla(){const A=$('#app');let cur='',seen=new Set(),t0=Date.now();
  A.innerHTML='<div class="tv"><main id="main"></main><aside id="side" class="stack"></aside></div><div class="ck" id="ck"></div><div class="tick"><span id="tk"></span></div><div class="camw" id="cw"><video id="cam" autoplay muted playsinline></video><b>● EN VIVO</b></div><button class="btn ghost sm" id="cb" style="position:fixed;left:12px;bottom:92px;display:none">Activar cámara</button>'+
  '<button class="btn ghost sm" id="fs" style="position:fixed;left:12px;bottom:48px">Pantalla completa</button><button class="btn ghost sm" id="xc">✕ Salir de pantalla completa</button>';
- let cine=false,mvT;
+ let cine=false,mvT,lastT=0,ps=-2;
+ window.onNetBack=()=>{setTimeout(()=>{const f=$('#vd iframe');if(!f||!f.dataset.src||!f.src||ps===1)return;const t=Math.max(0,Math.floor(lastT)-2);f.src=f.dataset.src+(t>0?'&start='+t:'')},4000)};
  const wl=()=>{try{navigator.wakeLock&&navigator.wakeLock.request('screen').catch(()=>{})}catch(e){}};wl();document.addEventListener('visibilitychange',()=>{if(!document.hidden)wl()});
  const wake=()=>{document.body.classList.add('mv');clearTimeout(mvT);mvT=setTimeout(()=>document.body.classList.remove('mv'),3000)};
  addEventListener('mousemove',wake);addEventListener('touchstart',wake);
@@ -305,13 +309,14 @@ function pantalla(){const A=$('#app');let cur='',seen=new Set(),t0=Date.now();
  $('#cb').onclick=()=>navigator.mediaDevices.getUserMedia({video:{width:640,height:480,facingMode:'user'},audio:false}).then(st=>{$('#cam').srcObject=st;camOn=true;view.upd()}).catch(()=>toast('No se pudo abrir la cámara'));
  function camUi(n){const c=cfg(),cw=$('#cw'),cb=$('#cb');cw.className='camw pos-'+c.camPos;cw.style.display=(c.cam&&camOn&&n)?'block':'none';cb.style.display=(c.cam&&!camOn)?'inline-flex':'none';if(!c.cam&&camOn){const st=$('#cam').srcObject;st&&st.getTracks().forEach(t=>t.stop());$('#cam').srcObject=null;camOn=false}}
  window.onmessage=e=>{if(!/youtube/.test(e.origin))return;let d;try{d=JSON.parse(e.data)}catch(x){return}
+  if(d&&d.event==='onStateChange')ps=d.info;if(d&&d.event==='infoDelivery'&&d.info){if(typeof d.info.currentTime==='number')lastT=d.info.currentTime;if(typeof d.info.playerState==='number')ps=d.info.playerState}
   if(d&&d.event==='onStateChange'&&d.info===0&&cfg().auto)next();
   if(d&&d.event==='onError'){cineOff();const n=nowP();if(n){const s=S.songs.find(x=>x.id===n.songId);if(s&&!s.bad)store.set('songs',s.id,Object.assign({},s,{bad:true}));
    const v=$('#vd');if(v&&!$('#vw'))v.insertAdjacentHTML('afterend','<p id="vw" class="glow" style="margin:10px 0 0">Este video no permite reproducirse en otras páginas. Pulsa «Mirar en YouTube» o elige una versión karaoke.</p>')}}};
  view={upd(){const n=nowP(),c=cfg(),w=waiting();camUi(n);const tk=$('#tk');if(tk){const t=w.length?w.map(x=>(x.modo==='rockola'?'🎵 ':'')+x.singer+' — '+x.title).join('     ♪     '):'Escanea el QR y pide tu canción';tk.textContent=t+'     ♪     '+t}
   S.claps.filter(k=>!seen.has(k.id)&&k.ts>=t0-5000).forEach(k=>{seen.add(k.id);burst(k);store.del('claps',k.id)});
   if(n){const id=ytId(n.video);
-   if(cur!==n.id){cur=n.id;cineOff();$('#main').innerHTML='<div class="vid" id="vd">'+(id?'<iframe title="Video" allow="autoplay; encrypted-media; fullscreen" data-src="https://www.youtube-nocookie.com/embed/'+id+'?autoplay=1&enablejsapi=1&rel=0&origin='+encodeURIComponent(location.origin)+'"></iframe>':'<div class="idle" style="height:100%;border:0"><div><h2 class="glow">Sin video</h2><p class="mut">Esta canción no tiene enlace de YouTube. Usa «Siguiente» en el panel.</p></div></div>')+'</div><div class="now" id="nw"></div><div class="mut" id="ns"></div><p><span class="eq"><i></i><i></i><i></i><i></i></span> <b id="cc">0 aplausos</b></p><p class="small"><a id="yl" target="_blank" rel="noopener" style="color:var(--brass)"></a></p>';
+   if(cur!==n.id){cur=n.id;cineOff();lastT=0;ps=-2;$('#main').innerHTML='<div class="vid" id="vd">'+(id?'<iframe title="Video" allow="autoplay; encrypted-media; fullscreen" data-src="https://www.youtube-nocookie.com/embed/'+id+'?autoplay=1&enablejsapi=1&rel=0&origin='+encodeURIComponent(location.origin)+'"></iframe>':'<div class="idle" style="height:100%;border:0"><div><h2 class="glow">Sin video</h2><p class="mut">Esta canción no tiene enlace de YouTube. Usa «Siguiente» en el panel.</p></div></div>')+'</div><div class="now" id="nw"></div><div class="mut" id="ns"></div><p><span class="eq"><i></i><i></i><i></i><i></i></span> <b id="cc">0 aplausos</b></p><p class="small"><a id="yl" target="_blank" rel="noopener" style="color:var(--brass)"></a></p>';
     const f=$('#vd iframe');if(f)f.onload=()=>{try{f.contentWindow.postMessage(JSON.stringify({event:'listening',id:1,channel:'widget'}),'*')}catch(x){}};cc=0;announce(n);if(f){const my=n.id;setTimeout(()=>{if(cur===my){f.src=f.dataset.src;cineOn(n)}},3800)}}
    $('#nw').textContent=n.title;$('#ns').textContent=n.modo==='rockola'?n.artist+' · pedida por la mesa '+n.mesa:n.artist+' · canta '+n.singer+' (mesa '+n.mesa+')';const yl=$('#yl');yl.href=id?'https://www.youtube.com/watch?v='+id:'https://www.youtube.com/results?search_query='+encodeURIComponent(n.title+' '+n.artist+' karaoke');yl.textContent=id?'¿No carga el video? Ábrelo en YouTube':'Buscar karaoke de esta canción en YouTube'}
   else{cur='';cineOff();const top={};S.queue.filter(q=>q.status==='done').forEach(q=>top[q.singer]=(top[q.singer]||0)+1);const t=Object.entries(top).sort((a,b)=>b[1]-a[1]).slice(0,5);
@@ -333,6 +338,11 @@ function guiaOperador(){const li=t=>'<li><span>'+t+'</span></li>';
  li('El siguiente cantante entra solo cuando termina el video. Si hace falta, toca <b>Siguiente</b>.')+
  li('Si un video no carga (bloqueado fuera de YouTube), ve a Catálogo, toca <b>Buscar video</b>, elige otro y guárdalo.')+
  li('Para salir de la pantalla completa en el televisor, toca o mueve el mouse y pulsa «Salir de pantalla completa».')+'</ol>'+
+ '<h3 class="sec">Si se corta el internet</h3><ol class="steps">'+
+ li('Aparece un aviso rojo «Sin conexión» arriba, en el televisor, el panel y los celulares.')+
+ li('La música se detiene. Los pedidos hechos en ese momento se envían solos cuando vuelve el internet.')+
+ li('Al volver aparece «✓ Conexión recuperada» y la pantalla intenta reanudar el video donde iba. Si no lo logra, toca <b>Siguiente</b> en la Cola.')+
+ li('Si recargas una página sin internet, entra en «Modo local». Cuando vuelva la conexión, recárgala.')+'</ol>'+
  '<h3 class="sec">Crear la clave de búsqueda de YouTube (gratis)</h3><ol class="steps">'+
  li('Entra a <b>console.cloud.google.com</b> y crea un proyecto.')+
  li('En «APIs y servicios» activa <b>YouTube Data API v3</b>.')+
@@ -403,9 +413,19 @@ function panel(){const A=$('#app');
  view={upd(){if(cur)cur.upd()}};show()}
 function sessionStorageOK(k,v){try{if(v!==undefined)sessionStorage.setItem(k,v);return sessionStorage.getItem(k)}catch(e){return window['_'+k]=v!==undefined?v:window['_'+k]}}
 
+/* ---------- conexión ---------- */
+function netWatch(){if(window._nw)return;window._nw=1;
+ const msg={cliente:'Sin conexión. Tus pedidos se enviarán cuando vuelva el internet.',panel:'Sin conexión. Los cambios se guardarán cuando vuelva el internet.',pantalla:'Sin conexión. La música continuará cuando vuelva el internet.'}[PAGE]||'Sin conexión.';
+ const el=document.createElement('div');el.id='off';el.setAttribute('role','status');el.hidden=true;document.body.appendChild(el);
+ let off=false,hide;
+ const set=v=>{if(v===off)return;off=v;window._off=v;clearTimeout(hide);if(v){el.className='';el.textContent='⚠ '+msg;el.hidden=false}else{el.className='back';el.textContent='✓ Conexión recuperada';el.hidden=false;hide=setTimeout(()=>{el.hidden=true},3500);try{window.onNetBack&&window.onNetBack()}catch(e){}}};
+ const ping=async()=>{if(!navigator.onLine)return set(true);if(!/^https?:/.test(location.protocol))return set(false);
+  try{const c=new AbortController(),t=setTimeout(()=>c.abort(),5000);await fetch(location.href.split('#')[0].split('?')[0]+'?_='+Date.now(),{method:'HEAD',cache:'no-store',signal:c.signal});clearTimeout(t);set(false)}catch(e){set(true)}};
+ addEventListener('offline',()=>set(true));addEventListener('online',ping);setInterval(ping,10000);ping()}
+
 /* ---------- ruteo e inicio ---------- */
 function route(){window.onmessage=null;
- if(PAGE==='pantalla')pantalla();else if(PAGE==='panel')panel();else if(PAGE==='cliente'){const m=parseInt(new URLSearchParams(location.search).get('mesa'));m>0?mesa(m):pickMesa()}else home()}
+ if(PAGE==='pantalla')pantalla();else if(PAGE==='panel')panel();else if(PAGE==='cliente'){const m=parseInt(new URLSearchParams(location.search).get('mesa'));m>0?mesa(m):pickMesa()}else home();netWatch()}
 function attach(st){store=st;['songs','queue','cfg','claps'].forEach(n=>st.sub(n,r=>{if(store!==st)return;S[n]=r;(S._l=S._l||{})[n]=1;try{view.upd()}catch(e){console.error(e)}}))}
 async function init(){
  addEventListener('hashchange',route);

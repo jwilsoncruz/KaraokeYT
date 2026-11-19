@@ -143,8 +143,10 @@ body.cine-on #xc{display:inline-flex}body.cine-on.mv #xc{opacity:1}
 <script>
 const DEF={bar:'Rockola Karaoke',premium:true,price:5,max:3,pin:'1234',auto:true,mesas:12,cam:false,camPos:'br',fsAuto:true,ytKey:'',ytClient:true,ytLim:5};
 const S={songs:[],queue:[],cfg:[],claps:[]};
-const VER='1.5';
-const LOG=[['1.5','19 nov 2026',['Aviso «Sin conexión» en el televisor, el panel y los celulares, y «Conexión recuperada» al volver.','Al volver el internet, la pantalla intenta reanudar el video donde iba.','Si un cliente pide una canción sin conexión, la app le avisa que se enviará cuando vuelva el internet.']],
+const VER='1.6';
+const LOG=[['1.6','19 nov 2026',['La pantalla del televisor es ahora la página principal: se abre con index.html.','Los QR de las mesas siguen funcionando igual (index.html?mesa=N).','Se eliminan cliente.html y pantalla.html: quedan solo index.html y panel.html.']],
+['1.5.1','19 nov 2026',['El cliente se abre solo con index.html: se elimina cliente.html.','La Guía lista los archivos del proyecto.']],
+['1.5','19 nov 2026',['Aviso «Sin conexión» en el televisor, el panel y los celulares, y «Conexión recuperada» al volver.','Al volver el internet, la pantalla intenta reanudar el video donde iba.','Si un cliente pide una canción sin conexión, la app le avisa que se enviará cuando vuelva el internet.']],
 ['1.4','19 nov 2026',['Límite de búsquedas de YouTube por celular y por hora (se cambia en Ajustes) y memoria de búsquedas repetidas, para cuidar la cuota diaria.','Tope de aplausos por celular para no gastar lecturas de Firebase.','Estado visible en la Cola: nube conectada o modo local, aviso si el PIN sigue en 1234 o falta la clave de YouTube.','La pantalla evita que el televisor se apague durante las canciones.']],
 ['1.3','19 nov 2026',['Nuevo botón «Versión rockola»: busca la canción original en YouTube solo para escuchar y ver en la pantalla.','Los pedidos rockola se marcan con 🎵 en la cola, la pantalla y el panel, y se presentan sin «subir al escenario».']],
 ['1.2','19 nov 2026',['Botones separados: «Buscar en el catálogo» y «Buscar en YouTube».','Los resultados de YouTube salen justo debajo del buscador.','Número de versión visible y lista de novedades en la Guía.']],
@@ -186,7 +188,7 @@ function modal(h){const m=document.createElement('div');m.className='modal';m.se
 function seedAll(force){SEED.forEach(x=>{if(force||!S.songs.some(s=>s.id===x.id))store.set('songs',x.id,{title:x.title,artist:x.artist,video:x.video,lang:SM[x.id][0],voz:SM[x.id][1]})});if(force)toast('20 temas cargados')}
 function grad(a){let h=0;for(const c of String(a))h=(h*31+c.charCodeAt(0))%360;return 'linear-gradient(135deg,hsl('+h+',70%,55%),hsl('+((h+50)%360)+',70%,38%))'}
 async function verify(){toast('Verificando videos…');let ok=0,bad=0,unk=0;for(const s of S.songs){if(!s.video)continue;try{const r=await fetch('https://www.youtube.com/oembed?format=json&url='+encodeURIComponent('https://www.youtube.com/watch?v='+s.video));if(r.ok){ok++;if(s.bad)store.set('songs',s.id,Object.assign({},s,{bad:false}))}else{bad++;store.set('songs',s.id,Object.assign({},s,{bad:true}))}}catch(e){unk++}}toast(ok||bad?ok+' correctos, '+bad+' con problema':'Este navegador no permite verificar; usa «Probar» en cada tema')}
-const PAGE=document.documentElement.dataset.page||'home';
+const PAGE=(p=>p==='auto'?((parseInt(new URLSearchParams(location.search).get('mesa'))>0||new URLSearchParams(location.search).has('cliente'))?'cliente':'pantalla'):p)(document.documentElement.dataset.page||'home');
 const stats=()=>{const d=S.queue.filter(x=>x.status==='done').length,p=S.queue.filter(x=>x.prio&&x.paid).length*(+cfg().price||0);return '<div class="stats"><div class="card"><b>'+waiting().length+'</b><span class="mut small">En espera</span></div><div class="card"><b>'+d+'</b><span class="mut small">Cantadas</span></div><div class="card"><b>Bs '+p+'</b><span class="mut small">Premium</span></div></div>'};
 function pickMesa(){$('#app').innerHTML=head(cfg().bar)+'<div class="wrap" style="text-align:center">'+vinyl(110)+'<h2 style="margin:14px 0">¿En qué mesa estás?</h2><div class="card stack"><input id="mn" type="number" min="1" placeholder="Número de mesa" aria-label="Número de mesa"><button class="btn" id="go">Entrar</button></div></div>';$('#go').onclick=()=>{const n=parseInt($('#mn').value);if(n>0)location.search='?mesa='+n;else toast('Escribe el número de mesa')};view={upd(){}}}
 function burst(k){const d=document.createElement('div');d.className='fl';d.style.left=(8+Math.random()*84)+'%';d.innerHTML=(k.e||'👏')+'<small>Mesa '+esc(k.mesa)+'</small>';document.body.appendChild(d);setTimeout(()=>d.remove(),3100);cc++;const el=$('#cc');if(el)el.textContent=cc+' aplausos'}
@@ -239,11 +241,11 @@ const head=(t,extra)=>'<div class="bar"><div class="brand">'+vinyl(36)+'<h1>'+es
 /* ---------- inicio ---------- */
 function home(){const A=$('#app');
  A.innerHTML=head(cfg().bar)+'<div class="wrap" style="text-align:center">'+vinyl(120)+'<p class="mut">Elige cómo quieres abrir la rockola en este dispositivo.</p><div class="home">'+
- '<a class="card" href="pantalla.html"><h3>Pantalla principal</h3><p class="mut small">Para el televisor o proyector: video, turno actual y próximos cantantes.</p></a>'+
+ '<a class="card" href="./"><h3>Pantalla principal</h3><p class="mut small">Para el televisor o proyector: video, turno actual y próximos cantantes.</p></a>'+
  '<a class="card" href="panel.html"><h3>Panel de control</h3><p class="mut small">Cola, catálogo, QR de mesas, prioridad premium y ajustes.</p></a>'+
  '<div class="card"><h3>Pedir desde una mesa</h3><div class="row" style="margin-top:10px"><input id="mn" type="number" min="1" placeholder="Número de mesa" aria-label="Número de mesa"><button class="btn" id="go">Entrar</button></div></div></div>'+
  '<p class="small mut" id="mode"></p></div>';
- $('#go').onclick=()=>{const n=parseInt($('#mn').value);if(n>0)location.href='cliente.html?mesa='+n;else toast('Escribe el número de mesa')};
+ $('#go').onclick=()=>{const n=parseInt($('#mn').value);if(n>0)location.href='index.html?mesa='+n;else toast('Escribe el número de mesa')};
  view={upd(){const m=$('#mode');if(m)m.textContent=store&&store.mode==='cloud'?'Conectado a la nube: todos los dispositivos comparten la cola.':'Modo local: los datos solo se comparten entre pestañas de este navegador.'}};view.upd()}
 
 /* ---------- mesa (cliente) ---------- */
@@ -328,7 +330,7 @@ function guiaOperador(){const li=t=>'<li><span>'+t+'</span></li>';
  return '<div class="card"><h3 style="font-size:18px">Guía rápida del operador</h3>'+
  '<h3 class="sec">Antes de abrir el local</h3><ol class="steps">'+
  li('Entra a <b>Cola</b> y confirma que arriba diga «☁ Conectado a la nube». Si dice «Modo local», los celulares no ven la cola. Cambia también el PIN en Ajustes.')+
- li('Abre <b>pantalla.html</b> en el televisor o proyector y pulsa <b>Pantalla completa</b> una sola vez. Desde ahí, cada video se pone a pantalla completa solo, justo después de presentar al cantante. Si el navegador no lo permite, usa F11.')+
+ li('Abre la dirección principal (<b>index.html</b>) en el televisor o proyector y pulsa <b>Pantalla completa</b> una sola vez. Desde ahí, cada video se pone a pantalla completa solo, justo después de presentar al cantante. Si el navegador no lo permite, usa F11.')+
  li('En <b>Catálogo</b> toca <b>Cargar los 20 temas</b> o agrega los tuyos. Elige idioma y voz (hombre, mujer, dúo, trío): con eso los clientes filtran.')+
  li('Pega el enlace de YouTube de cada tema y toca <b>Guardar video</b>. Sabrás que se guardó porque aparece «✓ ¡Guardado!» y la canción queda con la etiqueta verde «✓ Video guardado». Sin esa etiqueta, la canción no tiene video.')+
  li('En <b>Buscar karaoke</b> busca por artista o título, prueba el video y toca <b>Agregar al catálogo</b>.')+
@@ -349,14 +351,14 @@ function guiaOperador(){const li=t=>'<li><span>'+t+'</span></li>';
  li('En «Credenciales» crea una <b>clave de API</b>.')+
  li('Restríngela a tu sitio web (tu dominio) y solo a YouTube Data API v3.')+
  li('Pégala en <b>Ajustes</b> y guarda. Los clientes también podrán buscar desde su celular.')+'</ol>'+
- '<p class="small mut">Cada búsqueda gasta 100 unidades de la cuota diaria gratuita (por defecto 10 000, unas 100 búsquedas al día entre todos). Si se agota, el catálogo sigue funcionando. Para cuidarla, cada celular tiene un límite de búsquedas por hora (se cambia en Ajustes) y las búsquedas repetidas no gastan cuota.</p></div><div class="card" style="margin-top:12px"><h3 style="font-size:18px">Versión '+VER+'</h3>'+LOG.map(v=>'<h3 class="sec">v'+v[0]+' · '+v[1]+'</h3><ul class="small" style="margin:0;padding-left:18px">'+v[2].map(x=>'<li>'+x+'</li>').join('')+'</ul>').join('')+'</div>'}
+ '<p class="small mut">Cada búsqueda gasta 100 unidades de la cuota diaria gratuita (por defecto 10 000, unas 100 búsquedas al día entre todos). Si se agota, el catálogo sigue funcionando. Para cuidarla, cada celular tiene un límite de búsquedas por hora (se cambia en Ajustes) y las búsquedas repetidas no gastan cuota.</p><p class="small mut">Archivos del proyecto: <b>index.html</b> (la pantalla del televisor; con ?mesa=N abre la página de clientes, que es la de los QR) y <b>panel.html</b> (operador). Ya no se usan cliente.html ni pantalla.html.</p></div><div class="card" style="margin-top:12px"><h3 style="font-size:18px">Versión '+VER+'</h3>'+LOG.map(v=>'<h3 class="sec">v'+v[0]+' · '+v[1]+'</h3><ul class="small" style="margin:0;padding-left:18px">'+v[2].map(x=>'<li>'+x+'</li>').join('')+'</ul>').join('')+'</div>'}
 
 function estado(){const c=cfg();let h=store&&store.mode==='cloud'?'<span class="tag ok">☁ Conectado a la nube</span>':'<span class="tag w">⚠ Modo local: los celulares NO ven esta cola</span>';if(c.pin==='1234')h+='<span class="tag w">Cambia el PIN en Ajustes</span>';if(!c.ytKey)h+='<span class="tag">Sin clave de YouTube</span>';return '<div class="row" style="gap:6px">'+h+'</div>'}
 function panel(){const A=$('#app');
  if(!isAdmin&&sessionStorageOK('rk_ok')!=='1'){A.innerHTML=head('Panel')+'<div class="wrap"><div class="card stack"><h3>Ingresa el PIN</h3><input id="pin" type="password" inputmode="numeric" aria-label="PIN"><button class="btn" id="ok">Entrar</button><p class="small mut">PIN inicial: 1234. Cámbialo en Ajustes.</p></div></div>';
   $('#ok').onclick=()=>{if($('#pin').value===cfg().pin){sessionStorageOK('rk_ok','1');panel()}else toast('PIN incorrecto')};view={upd(){}};return}
  const T={cola:'Cola',cat:'Catálogo',yt:'Buscar karaoke',qr:'Mesas y QR',aj:'Ajustes',gd:'Guía'};let tab='cola',cur,sig='',yres=null;
- A.innerHTML=head(cfg().bar+' · panel','<span class="tag">v'+VER+'</span> <a class="btn ghost sm" href="pantalla.html" target="_blank">Abrir pantalla</a>')+'<div class="wrap"><div class="tabs" id="tb">'+Object.entries(T).map(([k,v])=>'<button class="chip" data-t="'+k+'">'+v+'</button>').join('')+'</div><div id="pb"></div></div>';
+ A.innerHTML=head(cfg().bar+' · panel','<span class="tag">v'+VER+'</span> <a class="btn ghost sm" href="index.html" target="_blank">Abrir pantalla</a>')+'<div class="wrap"><div class="tabs" id="tb">'+Object.entries(T).map(([k,v])=>'<button class="chip" data-t="'+k+'">'+v+'</button>').join('')+'</div><div id="pb"></div></div>';
  $('#tb').onclick=e=>{const b=e.target.closest('[data-t]');if(b){tab=b.dataset.t;show()}};
  const tabs={
  cola:{mount(){$('#pb').innerHTML='<div id="pc" class="stack"></div>';$('#pc').onclick=e=>{const b=e.target.closest('[data-a]');if(!b)return;const q=S.queue.find(x=>x.id===b.dataset.id),a=b.dataset.a;
@@ -424,7 +426,7 @@ function netWatch(){if(window._nw)return;window._nw=1;
  addEventListener('offline',()=>set(true));addEventListener('online',ping);setInterval(ping,10000);ping()}
 
 /* ---------- ruteo e inicio ---------- */
-function route(){window.onmessage=null;
+function route(){window.onmessage=null;if(PAGE==='cliente')document.title='Rockola · Pide tu canción';
  if(PAGE==='pantalla')pantalla();else if(PAGE==='panel')panel();else if(PAGE==='cliente'){const m=parseInt(new URLSearchParams(location.search).get('mesa'));m>0?mesa(m):pickMesa()}else home();netWatch()}
 function attach(st){store=st;['songs','queue','cfg','claps'].forEach(n=>st.sub(n,r=>{if(store!==st)return;S[n]=r;(S._l=S._l||{})[n]=1;try{view.upd()}catch(e){console.error(e)}}))}
 async function init(){

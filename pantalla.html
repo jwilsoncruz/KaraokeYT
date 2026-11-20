@@ -254,14 +254,19 @@ body::after,.bar h1,.np,.wrap>.card,.home>.card,.modal .card,.flash{animation:no
 .btn:hover{transform:none}
 }
 
-/* ---- Pantalla: escenario para TV ---- */
+/* ---- Pantalla: escenario para TV (versión liviana: sin desenfoques ni animaciones extra) ---- */
 body[data-p="pantalla"] .tv{gap:28px}
 body[data-p="pantalla"] .tv h1{letter-spacing:4px;text-transform:uppercase}
 body[data-p="pantalla"] .now{overflow-wrap:anywhere;letter-spacing:1px}
 body[data-p="pantalla"] .tv .card{border-radius:20px;border-color:rgba(34,229,255,.3)}
-body[data-p="pantalla"] .vid{border-radius:18px}
-body[data-p="pantalla"] .vid.cine{border-radius:0}
+body[data-p="pantalla"] .vid{border-radius:18px;box-shadow:0 0 14px rgba(34,229,255,.3)}
+body[data-p="pantalla"] .vid.cine{border-radius:0;box-shadow:none}
+body[data-p="pantalla"] .idle{box-shadow:0 0 14px rgba(34,229,255,.3)}
 body[data-p="pantalla"] .ck{font-size:24px;letter-spacing:2px}
+body[data-p="pantalla"] *{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+body[data-p="pantalla"]::after{animation:none!important;-webkit-mask-image:none;mask-image:none;display:none}
+body[data-p="pantalla"] .tv h1{animation:none!important;filter:none}
+body[data-p="pantalla"] .card{box-shadow:0 6px 18px rgba(0,0,0,.4)}
 /* ================== fin NEON STAGE ================== */
 </style>
 </head>
@@ -437,17 +442,16 @@ function pantalla(){const A=$('#app');let cur='',seen=new Set(),t0=Date.now();
  let camOn=false;const clock=()=>{const k=$('#ck');if(k)k.textContent=new Date().toLocaleTimeString('es-BO',{hour:'2-digit',minute:'2-digit'})};clock();setInterval(clock,1000);
  $('#cb').onclick=()=>navigator.mediaDevices.getUserMedia({video:{width:640,height:480,facingMode:'user'},audio:false}).then(st=>{$('#cam').srcObject=st;camOn=true;view.upd()}).catch(()=>toast('No se pudo abrir la cámara'));
  function camUi(n){const c=cfg(),cw=$('#cw'),cb=$('#cb');cw.className='camw pos-'+c.camPos;cw.style.display=(c.cam&&camOn&&n)?'block':'none';cb.style.display=(c.cam&&!camOn)?'inline-flex':'none';if(!c.cam&&camOn){const st=$('#cam').srcObject;st&&st.getTracks().forEach(t=>t.stop());$('#cam').srcObject=null;camOn=false}}
- let endedFor='';const endVid=()=>{if(!cur||endedFor===cur)return;endedFor=cur;if(cfg().auto)next()};
  window.onmessage=e=>{if(!/youtube/.test(e.origin))return;let d;try{d=JSON.parse(e.data)}catch(x){return}
-  if(d&&d.event==='onStateChange')ps=d.info;if(d&&d.event==='infoDelivery'&&d.info){if(typeof d.info.currentTime==='number')lastT=d.info.currentTime;if(typeof d.info.playerState==='number'){ps=d.info.playerState;if(ps===0)endVid()}}
-  if(d&&d.event==='onStateChange'&&d.info===0)endVid();
+  if(d&&d.event==='onStateChange')ps=d.info;if(d&&d.event==='infoDelivery'&&d.info){if(typeof d.info.currentTime==='number')lastT=d.info.currentTime;if(typeof d.info.playerState==='number')ps=d.info.playerState}
+  if(d&&d.event==='onStateChange'&&d.info===0&&cfg().auto)next();
   if(d&&d.event==='onError'){cineOff();const n=nowP();if(n){const s=S.songs.find(x=>x.id===n.songId);if(s&&!s.bad)store.set('songs',s.id,Object.assign({},s,{bad:true}));
    const v=$('#vd');if(v&&!$('#vw'))v.insertAdjacentHTML('afterend','<p id="vw" class="glow" style="margin:10px 0 0">Este video no permite reproducirse en otras páginas. Pulsa «Mirar en YouTube» o elige una versión karaoke.</p>')}}};
  view={upd(){const n=nowP(),c=cfg(),w=waiting();camUi(n);const tk=$('#tk');if(tk){const t=w.length?w.map(x=>(x.modo==='rockola'?'🎵 ':'')+x.singer+' — '+x.title).join('     ♪     '):'Escanea el QR y pide tu canción';tk.textContent=t+'     ♪     '+t}
   S.claps.filter(k=>!seen.has(k.id)&&k.ts>=t0-5000).forEach(k=>{seen.add(k.id);burst(k);store.del('claps',k.id)});
   if(n){const id=ytId(n.video);
    if(cur!==n.id){cur=n.id;cineOff();lastT=0;ps=-2;$('#main').innerHTML='<div class="vid" id="vd">'+(id?'<iframe title="Video" allow="autoplay; encrypted-media; fullscreen" data-src="https://www.youtube-nocookie.com/embed/'+id+'?autoplay=1&enablejsapi=1&rel=0&origin='+encodeURIComponent(location.origin)+'"></iframe>':'<div class="idle" style="height:100%;border:0"><div><h2 class="glow">Sin video</h2><p class="mut">Esta canción no tiene enlace de YouTube. Usa «Siguiente» en el panel.</p></div></div>')+'</div><div class="now" id="nw"></div><div class="mut" id="ns"></div><p><span class="eq"><i></i><i></i><i></i><i></i></span> <b id="cc">0 aplausos</b></p><p class="small"><a id="yl" target="_blank" rel="noopener" style="color:var(--brass)"></a></p>';
-    const f=$('#vd iframe');if(f)f.onload=()=>{ps=-2;let k=0;const ping=()=>{try{f.contentWindow.postMessage(JSON.stringify({event:'listening',id:1,channel:'widget'}),'*')}catch(x){}};ping();const iv=setInterval(()=>{if(ps!==-2||++k>60||!f.isConnected)clearInterval(iv);else ping()},500)};cc=0;announce(n);if(f){const my=n.id;setTimeout(()=>{if(cur===my){f.src=f.dataset.src;cineOn(n)}},3800)}}
+    const f=$('#vd iframe');if(f)f.onload=()=>{try{f.contentWindow.postMessage(JSON.stringify({event:'listening',id:1,channel:'widget'}),'*')}catch(x){}};cc=0;announce(n);if(f){const my=n.id;setTimeout(()=>{if(cur===my){f.src=f.dataset.src;cineOn(n)}},3800)}}
    $('#nw').textContent=n.title;$('#ns').textContent=n.modo==='rockola'?n.artist+' · pedida por la mesa '+n.mesa:n.artist+' · canta '+n.singer+' (mesa '+n.mesa+')';const yl=$('#yl');yl.href=id?'https://www.youtube.com/watch?v='+id:'https://www.youtube.com/results?search_query='+encodeURIComponent(n.title+' '+n.artist+' karaoke');yl.textContent=id?'¿No carga el video? Ábrelo en YouTube':'Buscar karaoke de esta canción en YouTube'}
   else{cur='';cineOff();const top={};S.queue.filter(q=>q.status==='done').forEach(q=>top[q.singer]=(top[q.singer]||0)+1);const t=Object.entries(top).sort((a,b)=>b[1]-a[1]).slice(0,5);
    $('#main').innerHTML='<h1>'+esc(c.bar)+'</h1><div class="idle" style="margin-top:16px"><div>'+vinyl(140)+'<h2 class="glow" style="font-size:clamp(26px,4vw,52px)">Escanea el QR de tu mesa</h2><p class="mut">Elige tu canción desde el celular y sube al escenario.</p>'+(t.length?'<p style="margin-top:18px"><b>Más cantores de la noche</b><br>'+t.map(x=>esc(x[0])+' ('+x[1]+')').join(' · ')+'</p>':'')+'</div></div>'}

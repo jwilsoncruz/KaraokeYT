@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="es" data-page="pantalla">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rockola · Escenario</title>
+<meta name="theme-color" content="#050813">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%23160c12'/%3E%3Crect x='14' y='24' width='72' height='46' rx='9' fill='none' stroke='%23ff3d6e' stroke-width='6'/%3E%3Cpath d='M42 36l20 11-20 11z' fill='%23e9b44c'/%3E%3Cpath d='M36 82h28M50 70v12' stroke='%23ff3d6e' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Orbitron:wght@500;700;900&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#160c12;--panel:#24141d;--line:#3d2431;--tx:#f6ecd9;--mut:#b79fa9;--brass:#e9b44c;--neon:#ff3d6e;--ok:#4ad6a0;--on:#1a0f14;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root[data-theme="light"]{--bg:#f7efe0;--panel:#fffaf0;--line:#e3d3b8;--tx:#2a1620;--mut:#7a6068;--brass:#a8710a;--neon:#d41f55;--ok:#12805a;--on:#fff}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 Outfit,system-ui,sans-serif;min-height:100vh}
+h1,h2,h3{font-family:Bungee,Impact,sans-serif;font-weight:400;margin:0;letter-spacing:.5px}
+button,input,select{font:inherit;color:inherit}
+input,select{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:11px 12px;width:100%}
+input:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.btn{background:var(--brass);color:var(--on);border:0;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}
+.btn.neon{background:var(--neon);color:#fff}.btn.ghost{background:transparent;color:var(--tx);border:1px solid var(--line)}
+.btn.sm{padding:6px 10px;font-size:14px}.btn[disabled]{opacity:.5}
+.wrap{max-width:760px;margin:0 auto;padding:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px}
+.row{display:flex;gap:10px;align-items:center}.grow{flex:1 1 150px;min-width:0}
+.mut{color:var(--mut)}.small{font-size:14px}
+.stack>*+*{margin-top:10px}
+.song{display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.song:last-child{border:0}.song{flex-wrap:wrap}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:4px 0 10px}
+.chip{white-space:nowrap;background:var(--panel);border:1px solid var(--line);border-radius:99px;padding:6px 12px;cursor:pointer}
+.chip.on{background:var(--brass);color:var(--on);border-color:var(--brass)}
+.tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:14px}
+.tag{display:inline-block;border-radius:99px;padding:2px 9px;font-size:13px;font-weight:700;background:var(--line)}
+.tag.p{background:var(--brass);color:var(--on)}.tag.w{background:var(--neon);color:#fff}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 16px;border-bottom:2px solid var(--brass)}
+.bar h1{font-size:22px;color:var(--brass)}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:10px 16px;border-radius:10px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:9;max-width:90vw}
+#toast.show{opacity:1}
+.home{display:grid;gap:12px;margin-top:18px}
+.qrs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.qrs .card{text-align:center}.qrs svg{width:100%;height:auto;background:#fff;border-radius:8px}
+.tv{min-height:100vh;display:grid;grid-template-columns:2fr 1fr;gap:22px;padding:22px}
+.tv h1{font-size:clamp(28px,4vw,56px);color:var(--brass)}
+.vid{aspect-ratio:16/9;width:100%;background:#000;border-radius:14px;overflow:hidden;border:2px solid var(--brass)}
+.vid iframe{width:100%;height:100%;border:0}
+.now{font-family:Bungee,Impact,sans-serif;font-size:clamp(24px,3.4vw,46px);line-height:1.1;margin:14px 0 4px}
+.idle{display:grid;place-items:center;text-align:center;aspect-ratio:16/9;background:var(--panel);border:2px solid var(--brass);border-radius:14px;padding:20px}
+.glow{color:var(--neon);text-shadow:0 0 18px color-mix(in srgb,var(--neon) 60%,transparent)}
+@media (max-width:820px){.tv{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+body{background:radial-gradient(1200px 600px at 15% -10%,#4a1030 0,transparent 60%),radial-gradient(900px 500px at 100% 10%,#1c2b5e 0,transparent 55%),var(--bg);background-attachment:fixed}
+body::before{content:"";position:fixed;inset:-20% -10% auto;height:75%;background:conic-gradient(from 200deg at 50% 0,transparent 0 20%,rgba(255,61,110,.2) 25%,transparent 30% 45%,rgba(233,180,76,.18) 50%,transparent 55% 70%,rgba(80,140,255,.18) 75%,transparent 80%);transform-origin:50% 0;animation:sweep 9s ease-in-out infinite alternate;pointer-events:none;z-index:0}
+#app{position:relative;z-index:1}
+@keyframes sweep{from{transform:rotate(-9deg)}to{transform:rotate(9deg)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.vinyl{animation:spin 6s linear infinite;flex:none;filter:drop-shadow(0 0 10px rgba(233,180,76,.5))}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.bar{background:linear-gradient(90deg,rgba(255,61,110,.14),rgba(233,180,76,.1));backdrop-filter:blur(8px)}
+.bar h1,.tv h1{background:linear-gradient(90deg,var(--brass),#fff3c4,var(--brass));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 12px rgba(233,180,76,.45))}
+.card{background:linear-gradient(160deg,color-mix(in srgb,var(--panel) 92%,transparent),color-mix(in srgb,var(--bg) 78%,transparent));box-shadow:0 10px 30px rgba(0,0,0,.28)}
+.btn{display:inline-flex;align-items:center;gap:6px;transition:transform .15s}.btn:active{transform:scale(.94)}
+.btn:not(.ghost):not(.neon){background:linear-gradient(135deg,#f7d27a,var(--brass))}
+.btn.neon{background:linear-gradient(135deg,var(--neon),#ff8a3d);box-shadow:0 0 18px rgba(255,61,110,.5)}
+.turn{display:flex;align-items:center;gap:10px;justify-content:center;padding:14px;margin-bottom:10px;border-radius:12px;font-weight:700;background:linear-gradient(135deg,var(--neon),#ff8a3d);color:#fff;animation:pulse 1.2s infinite}
+@keyframes pulse{50%{transform:scale(1.03);box-shadow:0 0 28px rgba(255,61,110,.7)}}
+.react{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;gap:4px;padding:8px 10px;border-radius:99px;background:color-mix(in srgb,var(--panel) 88%,transparent);backdrop-filter:blur(10px);border:1px solid var(--brass);box-shadow:0 8px 30px rgba(0,0,0,.45);z-index:5}
+.react button{background:none;border:0;font-size:28px;cursor:pointer;padding:2px 8px;transition:transform .12s}.react button:active{transform:scale(1.6)}
+.wrap{padding-bottom:96px}
+.eq{display:inline-flex;gap:3px;align-items:flex-end;height:18px;vertical-align:middle}.eq i{width:4px;background:var(--neon);border-radius:2px;animation:eq .9s ease-in-out infinite}
+.eq i:nth-child(2){animation-delay:.2s}.eq i:nth-child(3){animation-delay:.4s}.eq i:nth-child(4){animation-delay:.1s}
+@keyframes eq{0%,100%{height:4px}50%{height:18px}}
+.ann{position:fixed;inset:0;z-index:20;display:grid;place-items:center;text-align:center;padding:20px;background:radial-gradient(circle at 50% 40%,rgba(255,61,110,.55),rgba(10,3,8,.96) 70%);animation:annin .4s,annout .5s 3.3s forwards}
+.ann small{font-family:Bungee,sans-serif;letter-spacing:6px;color:#e9b44c;font-size:clamp(16px,3vw,36px)}
+.ann h2{font-size:clamp(44px,9vw,120px);line-height:1;margin:12px 0;background:linear-gradient(90deg,#fff,#e9b44c,#fff);-webkit-background-clip:text;background-clip:text;color:transparent;animation:zoom 3.8s ease-out}
+.ann p{font-size:clamp(18px,3vw,40px);color:#fff;margin:0}
+.conf i{position:fixed;top:-20px;width:10px;height:16px;z-index:21;animation:fall 3s linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+@keyframes zoom{from{transform:scale(.3);opacity:0}15%{transform:scale(1.08);opacity:1}to{transform:scale(1)}}
+@keyframes annin{from{opacity:0}}@keyframes annout{to{opacity:0;visibility:hidden}}
+.fl{position:fixed;bottom:-40px;z-index:15;font-size:clamp(34px,5vw,64px);text-align:center;animation:rise 3s ease-out forwards;pointer-events:none}
+.fl small{display:block;font:700 14px Outfit,sans-serif;color:#fff;text-shadow:0 1px 4px #000}
+@keyframes rise{to{transform:translateY(-80vh);opacity:0}}
+@media (prefers-reduced-motion:reduce){body::before,.vinyl,.eq i,.turn,.ann h2{animation:none!important}}
+
+body[data-p="panel"]{--brass:#7fe0c3;--neon:#4fb3ff}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stats .card{text-align:center}
+.stats b{display:block;font:400 24px Bungee,Impact,sans-serif;color:var(--brass)}
+.tv{padding-top:56px;padding-bottom:60px}
+#side svg{width:min(100%,180px);height:auto;background:#fff;border-radius:10px}
+.ck{position:fixed;right:22px;top:12px;font:400 22px Bungee,Impact,sans-serif;color:var(--brass);z-index:6}
+.tick{position:fixed;left:0;right:0;bottom:0;height:40px;overflow:hidden;background:linear-gradient(90deg,rgba(255,61,110,.22),rgba(233,180,76,.16));border-top:1px solid var(--brass);display:flex;align-items:center;z-index:6}
+.tick span{white-space:pre;padding-left:100%;font-weight:600;animation:mq 45s linear infinite}
+@keyframes mq{to{transform:translateX(-100%)}}
+.camw{position:fixed;z-index:7;width:clamp(150px,18vw,260px);aspect-ratio:1;border-radius:50%;overflow:hidden;border:3px solid var(--neon);box-shadow:0 0 28px rgba(255,61,110,.7);display:none}
+.camw video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.camw b{position:absolute;left:50%;bottom:8%;transform:translateX(-50%);background:#e11;color:#fff;font-size:12px;padding:2px 10px;border-radius:99px}
+.pos-tl{left:24px;top:64px}.pos-tr{right:24px;top:64px}.pos-bl{left:24px;bottom:56px}.pos-br{right:24px;bottom:56px}
+
+.bar{position:sticky;top:0;z-index:8}
+.rk{font:400 14px Bungee,Impact,sans-serif;color:var(--brass);width:22px;text-align:center;flex:none}
+.av{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font:700 18px Outfit,sans-serif;color:#fff;flex:none;box-shadow:0 4px 12px rgba(0,0,0,.4)}
+.np{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:14px;margin-bottom:12px;background:linear-gradient(135deg,rgba(255,61,110,.28),rgba(233,180,76,.2));border:1px solid var(--neon)}
+.sec{font-size:15px;color:var(--brass);margin:16px 2px 8px;letter-spacing:1px}
+.btn.neon{position:relative;overflow:hidden}
+.btn.neon::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.45) 50%,transparent 70%);transform:translateX(-120%);animation:shine 3.2s infinite}
+@keyframes shine{to{transform:translateX(120%)}}
+.song:hover{background:rgba(255,255,255,.03)}
+
+[hidden]{display:none!important}
+.row{flex-wrap:wrap}
+.srow>input{flex:1 1 0;min-width:0}.srow>.btn{flex:none}
+.fgrp{display:flex;gap:6px;align-items:center;overflow-x:auto;padding:2px 0}
+.fgrp>small{color:var(--mut);flex:none;min-width:52px;font-weight:600}
+.song select{width:auto;padding:6px 8px;font-size:14px}
+.tag.ok{background:var(--ok);color:#06241a}
+.flash{animation:flash 2.4s ease-out}
+@keyframes flash{0%,65%{background:color-mix(in srgb,var(--ok) 30%,transparent)}}
+.th{width:96px;height:54px;border-radius:8px;object-fit:cover;flex:none;background:#000}
+.modal{position:fixed;inset:0;z-index:30;display:grid;place-items:center;padding:16px;background:rgba(10,3,8,.78);backdrop-filter:blur(4px)}
+.modal .card{max-width:480px;width:100%;max-height:88vh;overflow:auto}
+.steps{counter-reset:s;list-style:none;margin:10px 0 14px;padding:0}
+.steps li{counter-increment:s;display:flex;gap:12px;padding:7px 0;align-items:flex-start}
+.steps li::before{content:counter(s);flex:none;width:26px;height:26px;border-radius:50%;background:var(--brass);color:var(--on);display:grid;place-items:center;font:700 14px Outfit,sans-serif}
+.vid.cine{position:fixed;inset:0;z-index:12;width:100%;height:100%;aspect-ratio:auto;border:0;border-radius:0}
+.camw{z-index:13}
+#fs,#cb{z-index:14}
+#xc{position:fixed;right:14px;top:14px;z-index:14;display:none;opacity:0;transition:opacity .3s}
+body.cine-on #xc{display:inline-flex}body.cine-on.mv #xc{opacity:1}
+.lt{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:13;max-width:80vw;padding:12px 20px;border-radius:12px;background:rgba(10,3,8,.74);backdrop-filter:blur(6px);border-left:4px solid var(--neon);color:#fff;font-size:clamp(16px,2.2vw,28px);animation:ltout .6s 7s forwards;pointer-events:none}
+@keyframes ltout{to{opacity:0;visibility:hidden}}
+#off{position:fixed;left:50%;top:calc(8px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:40;padding:8px 16px;border-radius:99px;background:var(--neon);color:#fff;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.4);max-width:92vw;text-align:center}
+#off.back{background:var(--ok);color:#06241a}
+
+/* ===================== NEON STAGE · capa visual ===================== */
+:root:not([data-theme="light"]){--bg:#050813;--panel:#0c1325;--line:rgba(110,160,255,.2);--tx:#e8f1ff;--mut:#8b9cc0;--brass:#22e5ff;--neon:#b04dff;--mag:#ff2bd6;--ok:#34f5b0;--on:#021019;--fd:Orbitron,Outfit,system-ui,sans-serif}
+:root:not([data-theme="light"]) body[data-p="cliente"],:root:not([data-theme="light"]) body[data-p="pantalla"]{--brass:#22e5ff;--neon:#b04dff}
+:root:not([data-theme="light"]) body[data-p="panel"]{--brass:#2ef0d8;--neon:#4d8dff}
+h1,h2,h3,.now,.stats b,.ck,.rk,.ann small,.sec{font-family:var(--fd,Orbitron,Outfit,sans-serif)}
+h1,h2,h3{font-weight:700;letter-spacing:1px}
+body{font-family:Outfit,system-ui,sans-serif}
+:root:not([data-theme="light"]) body{background:radial-gradient(1100px 600px at 12% -10%,rgba(176,77,255,.32) 0,transparent 60%),radial-gradient(900px 520px at 100% 0,rgba(34,229,255,.2) 0,transparent 58%),radial-gradient(700px 500px at 50% 120%,rgba(255,43,214,.12) 0,transparent 60%),linear-gradient(180deg,#060a18,#03050c);background-attachment:fixed}
+:root:not([data-theme="light"]) body[data-p="panel"]{background:radial-gradient(1000px 560px at 85% -10%,rgba(34,229,255,.18) 0,transparent 60%),radial-gradient(800px 500px at 0 10%,rgba(77,141,255,.2) 0,transparent 58%),linear-gradient(180deg,#050912,#03060d);background-attachment:fixed}
+:root:not([data-theme="light"]) body::before{background:conic-gradient(from 200deg at 50% 0,transparent 0 20%,rgba(176,77,255,.24) 25%,transparent 30% 45%,rgba(34,229,255,.2) 50%,transparent 55% 70%,rgba(255,43,214,.16) 75%,transparent 80%)}
+body::after{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(420px 420px at 20% 30%,rgba(34,229,255,.1),transparent 70%),radial-gradient(520px 520px at 80% 70%,rgba(176,77,255,.12),transparent 70%),linear-gradient(rgba(120,170,255,.05) 1px,transparent 1px) 0 0/44px 44px,linear-gradient(90deg,rgba(120,170,255,.05) 1px,transparent 1px) 0 0/44px 44px;-webkit-mask-image:linear-gradient(180deg,#000 0,rgba(0,0,0,.35) 70%,transparent);mask-image:linear-gradient(180deg,#000 0,rgba(0,0,0,.35) 70%,transparent);animation:ns-drift 16s ease-in-out infinite alternate}
+@keyframes ns-drift{from{transform:translate3d(-1.5%,0,0)}to{transform:translate3d(1.5%,1%,0)}}
+::selection{background:rgba(176,77,255,.5)}
+*{scrollbar-width:thin;scrollbar-color:rgba(34,229,255,.4) transparent}
+select option{background:#0c1325;color:var(--tx)}
+
+/* Paneles de cristal */
+.card{background:linear-gradient(160deg,rgba(20,30,56,.62),rgba(8,12,26,.55));-webkit-backdrop-filter:blur(14px) saturate(140%);backdrop-filter:blur(14px) saturate(140%);border:1px solid var(--line);border-radius:16px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 12px 38px rgba(0,0,0,.5),0 0 26px rgba(34,229,255,.06)}
+.wrap>.card,.home>.card,.modal .card{animation:ns-in .45s cubic-bezier(.2,.7,.2,1) both}
+@keyframes ns-in{from{opacity:0;transform:translateY(12px) scale(.985)}}
+.modal{background:rgba(3,5,12,.8);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.modal .card{border-color:rgba(34,229,255,.4);box-shadow:0 0 40px rgba(34,229,255,.2),0 20px 60px rgba(0,0,0,.6)}
+
+/* Barra superior */
+.bar{border-bottom:1px solid rgba(34,229,255,.45);background:linear-gradient(90deg,rgba(176,77,255,.16),rgba(34,229,255,.1) 60%,rgba(255,43,214,.08));box-shadow:0 8px 30px rgba(0,0,0,.4),0 1px 18px rgba(34,229,255,.18);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.bar h1{font-size:19px;letter-spacing:2px;background:linear-gradient(90deg,#22e5ff,#e8f6ff,#d08bff,#22e5ff);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 10px rgba(34,229,255,.5));animation:ns-shift 8s linear infinite}
+@keyframes ns-shift{to{background-position:200% 0}}
+.tv h1{background:linear-gradient(90deg,#22e5ff,#e8f6ff,#d08bff);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 14px rgba(34,229,255,.5))}
+.vinyl{filter:drop-shadow(0 0 12px rgba(34,229,255,.6))}
+.vinyl circle[stroke="#e9b44c"]{stroke:var(--brass)}.vinyl circle[fill="#ff3d6e"]{fill:var(--neon)}
+.sec{font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--brass);display:flex;align-items:center;gap:10px;text-shadow:0 0 12px rgba(34,229,255,.5)}
+.sec::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(34,229,255,.5),transparent)}
+
+/* Campos y botones */
+input,select{background:rgba(5,9,20,.7);border:1px solid var(--line);border-radius:12px;transition:border-color .2s,box-shadow .2s}
+input::placeholder{color:rgba(139,156,192,.7)}
+input:focus,select:focus{outline:none;border-color:var(--brass);box-shadow:0 0 0 3px rgba(34,229,255,.18),0 0 18px rgba(34,229,255,.3)}
+input:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+.btn{border-radius:12px;font-weight:700;letter-spacing:.3px;transition:transform .15s,box-shadow .2s,filter .2s,border-color .2s,background .2s}
+.btn:not(.ghost):not(.neon){background:linear-gradient(135deg,#22e5ff,#4d8dff);color:var(--on);box-shadow:0 0 16px rgba(34,229,255,.4)}
+.btn.neon{background:linear-gradient(135deg,#b04dff,#ff2bd6);color:#fff;box-shadow:0 0 20px rgba(176,77,255,.55)}
+.btn.ghost{background:rgba(255,255,255,.03);border:1px solid rgba(110,160,255,.3);color:var(--tx)}
+@media (hover:hover){.btn:hover{transform:translateY(-2px);filter:brightness(1.12)}.btn:not(.ghost):not(.neon):hover{box-shadow:0 0 26px rgba(34,229,255,.7)}.btn.neon:hover{box-shadow:0 0 30px rgba(255,43,214,.7)}.btn.ghost:hover{border-color:var(--brass);box-shadow:0 0 16px rgba(34,229,255,.35);color:#fff}.chip:hover{border-color:var(--brass);box-shadow:0 0 14px rgba(34,229,255,.3)}}
+.btn:active{transform:scale(.94)}
+.btn[disabled]{opacity:.45;box-shadow:none;filter:grayscale(.4)}
+.chip{background:rgba(255,255,255,.04);border:1px solid rgba(110,160,255,.25);transition:all .2s}
+.chip.on{background:linear-gradient(135deg,#22e5ff,#7c6bff);color:var(--on);border-color:transparent;box-shadow:0 0 18px rgba(34,229,255,.55);font-weight:700}
+.tag{background:rgba(110,160,255,.18);letter-spacing:.3px}
+.tag.p{background:linear-gradient(135deg,#22e5ff,#4d8dff);color:var(--on);box-shadow:0 0 10px rgba(34,229,255,.45)}
+.tag.w{background:linear-gradient(135deg,#b04dff,#ff2bd6);box-shadow:0 0 10px rgba(255,43,214,.4)}
+.tag.ok{background:var(--ok);color:#03221a;box-shadow:0 0 10px rgba(52,245,176,.4)}
+.th{border:1px solid rgba(34,229,255,.35);box-shadow:0 0 12px rgba(34,229,255,.2)}
+.song{border-bottom:1px solid rgba(110,160,255,.14);transition:background .2s,box-shadow .2s}
+.song:hover{background:linear-gradient(90deg,rgba(34,229,255,.07),transparent)}
+
+/* Sonando ahora, ecualizador y turno */
+.np{background:linear-gradient(135deg,rgba(176,77,255,.28),rgba(34,229,255,.16));border:1px solid rgba(34,229,255,.6);border-radius:16px;animation:ns-np 2.6s ease-in-out infinite}
+@keyframes ns-np{0%,100%{box-shadow:0 0 14px rgba(34,229,255,.25),inset 0 0 18px rgba(176,77,255,.12)}50%{box-shadow:0 0 30px rgba(176,77,255,.55),inset 0 0 24px rgba(34,229,255,.16)}}
+.eq i{background:linear-gradient(180deg,#22e5ff,#ff2bd6);box-shadow:0 0 8px rgba(34,229,255,.7)}
+.turn{background:linear-gradient(135deg,#b04dff,#ff2bd6);border-radius:14px}
+@keyframes pulse{50%{transform:scale(1.03);box-shadow:0 0 30px rgba(176,77,255,.75)}}
+.flash{animation:flash 2.4s ease-out}
+@keyframes flash{0%,65%{background:rgba(52,245,176,.22);box-shadow:inset 3px 0 0 var(--ok)}}
+.rk{color:var(--brass);text-shadow:0 0 10px rgba(34,229,255,.6)}
+.av{box-shadow:0 0 0 2px rgba(34,229,255,.4),0 4px 14px rgba(0,0,0,.5)}
+.steps li::before{background:linear-gradient(135deg,#22e5ff,#b04dff);box-shadow:0 0 12px rgba(34,229,255,.5)}
+.react{background:rgba(10,16,34,.75);border:1px solid rgba(34,229,255,.5);box-shadow:0 8px 30px rgba(0,0,0,.5),0 0 22px rgba(34,229,255,.25);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+
+/* Notificaciones */
+#toast{background:rgba(10,18,38,.88);color:var(--tx);border:1px solid var(--brass);border-radius:12px;box-shadow:0 0 24px rgba(34,229,255,.35),0 10px 30px rgba(0,0,0,.5);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+#off{background:linear-gradient(135deg,#b04dff,#ff2bd6);box-shadow:0 0 24px rgba(255,43,214,.5),0 8px 24px rgba(0,0,0,.4)}
+#off.back{background:linear-gradient(135deg,#34f5b0,#22e5ff);color:#03221a;box-shadow:0 0 24px rgba(52,245,176,.5)}
+.ann{background:radial-gradient(circle at 50% 40%,rgba(176,77,255,.6),rgba(3,5,12,.96) 70%)}
+.ann small{color:var(--brass);text-shadow:0 0 16px rgba(34,229,255,.7)}
+.ann h2{background:linear-gradient(90deg,#fff,#22e5ff,#e08bff,#fff);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* Pantalla de televisión (solo apariencia) */
+.vid,.idle{border:2px solid rgba(34,229,255,.7);box-shadow:0 0 34px rgba(34,229,255,.35),0 0 80px rgba(176,77,255,.2)}
+.idle{background:linear-gradient(160deg,rgba(20,30,56,.7),rgba(8,12,26,.7))}
+.vid.cine{border:0;box-shadow:none}
+.now{text-shadow:0 0 22px rgba(34,229,255,.45)}
+.glow{color:#d08bff;text-shadow:0 0 18px rgba(176,77,255,.8)}
+.ck{color:var(--brass);text-shadow:0 0 14px rgba(34,229,255,.7)}
+.tick{background:linear-gradient(90deg,rgba(176,77,255,.28),rgba(34,229,255,.18));border-top:1px solid rgba(34,229,255,.6);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.camw{border-color:var(--brass);box-shadow:0 0 28px rgba(34,229,255,.7)}
+.lt{background:rgba(5,9,20,.78);border-left:4px solid var(--brass);box-shadow:0 0 24px rgba(34,229,255,.3)}
+.qrs svg,#side svg{box-shadow:0 0 18px rgba(34,229,255,.35)}
+
+/* ---- Cliente: app para pedir canciones ---- */
+body[data-p="cliente"] .wrap{max-width:720px}
+body[data-p="cliente"] .srow>input{font-size:17px;padding:14px 16px;border-radius:14px}
+body[data-p="cliente"] .home .card{border-radius:20px}
+body[data-p="cliente"] .bar h1{font-size:17px}
+
+/* ---- Panel: consola de operador ---- */
+body[data-p="panel"] .wrap{max-width:1040px}
+body[data-p="panel"] .card{border-radius:10px;border-color:rgba(34,229,255,.22);background:linear-gradient(160deg,rgba(14,24,44,.78),rgba(6,10,22,.72));box-shadow:inset 0 1px 0 rgba(34,229,255,.12),0 8px 26px rgba(0,0,0,.5)}
+body[data-p="panel"] .bar{border-bottom-color:rgba(46,240,216,.6);background:linear-gradient(90deg,rgba(46,240,216,.1),rgba(77,141,255,.1),rgba(10,16,34,.4))}
+body[data-p="panel"] .bar h1{font-size:15px;letter-spacing:4px;text-transform:uppercase}
+body[data-p="panel"] .stats{gap:12px}
+body[data-p="panel"] .stats .card{padding:14px 8px;position:relative;overflow:hidden}
+body[data-p="panel"] .stats .card::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,transparent,var(--brass),transparent)}
+body[data-p="panel"] .stats b{font-size:clamp(22px,4vw,34px);font-weight:900;text-shadow:0 0 16px rgba(46,240,216,.7)}
+body[data-p="panel"] .tabs{padding:4px;border:1px solid var(--line);border-radius:14px;background:rgba(5,9,20,.6)}
+body[data-p="panel"] .tabs .chip{border-radius:10px;border-color:transparent;background:transparent;font-weight:600;text-transform:uppercase;font-size:13px;letter-spacing:1px}
+body[data-p="panel"] .tabs .chip.on{background:linear-gradient(135deg,rgba(46,240,216,.9),rgba(77,141,255,.9))}
+
+@media (max-width:560px){
+.bar{padding:10px 12px}.bar h1{font-size:15px;letter-spacing:1px}
+.wrap{padding:12px;padding-bottom:96px}.card{border-radius:14px;padding:12px}
+body[data-p="panel"] .stats b{font-size:20px}
+.tv{padding:14px}
+}
+@media (prefers-reduced-motion:reduce){
+body::after,.bar h1,.np,.wrap>.card,.home>.card,.modal .card,.flash{animation:none!important}
+.btn,.chip,input,select,.song{transition:none!important}
+.btn:hover{transform:none}
+}
+
+/* ---- Pantalla: escenario para TV ---- */
+body[data-p="pantalla"] .tv{gap:28px}
+body[data-p="pantalla"] .tv h1{letter-spacing:4px;text-transform:uppercase}
+body[data-p="pantalla"] .now{overflow-wrap:anywhere;letter-spacing:1px}
+body[data-p="pantalla"] .tv .card{border-radius:20px;border-color:rgba(34,229,255,.3)}
+body[data-p="pantalla"] .vid{border-radius:18px}
+body[data-p="pantalla"] .vid.cine{border-radius:0}
+body[data-p="pantalla"] .ck{font-size:24px;letter-spacing:2px}
+/* ================== fin NEON STAGE ================== */
+</style>
+</head>
+<body data-p="pantalla">
+<div id="app"></div>
+<div id="toast" role="status"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script>
+const DEF={bar:'Rockola Karaoke',premium:true,price:5,max:3,pin:'1234',auto:true,mesas:12,cam:false,camPos:'br',fsAuto:true,ytKey:'',ytClient:true,ytLim:5};
+const S={songs:[],queue:[],cfg:[],claps:[]};
+const VER='1.5';
+const LOG=[['1.5','19 nov 2026',['Aviso «Sin conexión» en el televisor, el panel y los celulares, y «Conexión recuperada» al volver.','Al volver el internet, la pantalla intenta reanudar el video donde iba.','Si un cliente pide una canción sin conexión, la app le avisa que se enviará cuando vuelva el internet.']],
+['1.4','19 nov 2026',['Límite de búsquedas de YouTube por celular y por hora (se cambia en Ajustes) y memoria de búsquedas repetidas, para cuidar la cuota diaria.','Tope de aplausos por celular para no gastar lecturas de Firebase.','Estado visible en la Cola: nube conectada o modo local, aviso si el PIN sigue en 1234 o falta la clave de YouTube.','La pantalla evita que el televisor se apague durante las canciones.']],
+['1.3','19 nov 2026',['Nuevo botón «Versión rockola»: busca la canción original en YouTube solo para escuchar y ver en la pantalla.','Los pedidos rockola se marcan con 🎵 en la cola, la pantalla y el panel, y se presentan sin «subir al escenario».']],
+['1.2','19 nov 2026',['Botones separados: «Buscar en el catálogo» y «Buscar en YouTube».','Los resultados de YouTube salen justo debajo del buscador.','Número de versión visible y lista de novedades en la Guía.']],
+['1.1','19 nov 2026',['Filtros por idioma y voz (hombre, mujer, dúo, trío) en el cliente.','Pantalla completa automática del video después de presentar al cantante.','Aviso «✓ Video guardado» en el catálogo.','Guía rápida para clientes y para el operador.','Búsqueda de karaokes nuevos en YouTube (panel y cliente).']],
+['1.0','Versión inicial',['Cola de pedidos, catálogo de 20 temas y QR por mesa.','Prioridad premium, aplausos y cámara en pantalla.']]];
+const P={mic:'<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4M8 22h8"/>',crown:'<path d="M2 7l5 5 5-8 5 8 5-5-2 12H4z"/>',note:'<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>'};
+const ic=(n,z)=>'<svg width="'+(z||20)+'" height="'+(z||20)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+P[n]+'</svg>';
+const vinyl=z=>'<svg class="vinyl" width="'+z+'" height="'+z+'" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="#0d0609" stroke="#e9b44c" stroke-width="2"/><circle cx="50" cy="50" r="40" fill="none" stroke="#3d2431"/><circle cx="50" cy="50" r="33" fill="none" stroke="#3d2431"/><circle cx="50" cy="50" r="26" fill="none" stroke="#3d2431"/><path d="M50 50L88 18A48 48 0 0 1 98 50z" fill="#fff" opacity=".07"/><circle cx="50" cy="50" r="16" fill="#ff3d6e"/><circle cx="50" cy="50" r="3" fill="#0d0609"/></svg>';
+let cc=0;
+const SEED=[{"id": "k01", "title": "Llorando se fue", "artist": "Los Kjarkas", "video": "Yu5FIkja_ac"}, {"id": "k02", "title": "Hasta que te conocí", "artist": "Juan Gabriel", "video": "rfwVxgkx_Q8"}, {"id": "k03", "title": "Amor eterno", "artist": "Juan Gabriel · Rocío Dúrcal", "video": "lmpu-TapWiE"}, {"id": "k04", "title": "El rey", "artist": "José Alfredo Jiménez", "video": "2iFUHvnPw4U"}, {"id": "k05", "title": "Volver, volver", "artist": "Vicente Fernández", "video": "gHv4uIAbqyk"}, {"id": "k06", "title": "Mujeres divinas", "artist": "Vicente Fernández", "video": "y-jrP3XS3Zc"}, {"id": "k07", "title": "Si nos dejan", "artist": "Luis Miguel", "video": "GgAJOEkji1A"}, {"id": "k08", "title": "La incondicional", "artist": "Luis Miguel", "video": "mz3UmLV3GQg"}, {"id": "k09", "title": "Bésame mucho", "artist": "Consuelo Velázquez", "video": "FdKhNlmwdhQ"}, {"id": "k10", "title": "Sabor a mí", "artist": "Eydie Gormé · Los Panchos", "video": "SjFa7U4vhNc"}, {"id": "k11", "title": "Rata de dos patas", "artist": "Paquita la del Barrio", "video": "2L1pmrObw3U"}, {"id": "k12", "title": "Tu cárcel", "artist": "Los Bukis", "video": "N43_aI15eZI"}, {"id": "k13", "title": "Y volveré", "artist": "Los Ángeles Negros", "video": "wkKwcO0608c"}, {"id": "k14", "title": "Cielito lindo", "artist": "Mariachi Vargas", "video": "DLVnfDS8uCo"}, {"id": "k15", "title": "Vivir mi vida", "artist": "Marc Anthony", "video": "7JixobgHhYA"}, {"id": "k16", "title": "Corazón partío", "artist": "Alejandro Sanz", "video": "LYiI-QCFIoQ"}, {"id": "k17", "title": "Bailando", "artist": "Enrique Iglesias", "video": "mgPf4mYE-fw"}, {"id": "k18", "title": "Color esperanza", "artist": "Diego Torres", "video": "00D4HznH2xw"}, {"id": "k19", "title": "El triste", "artist": "José José", "video": "bBRkfqaYHqs"}, {"id": "k20", "title": "Despacito", "artist": "Luis Fonsi", "video": "hVW2G5CzrrI"}];
+const songs=()=>S.songs.length?S.songs:SEED;
+const SM={k01:['es','hombre'],k02:['es','hombre'],k03:['es','mujer'],k04:['es','hombre'],k05:['es','hombre'],k06:['es','hombre'],k07:['es','hombre'],k08:['es','hombre'],k09:['es','hombre'],k10:['es','mujer'],k11:['es','mujer'],k12:['es','hombre'],k13:['es','hombre'],k14:['es','hombre'],k15:['es','hombre'],k16:['es','hombre'],k17:['es','hombre'],k18:['es','hombre'],k19:['es','hombre'],k20:['es','hombre']};
+const LANGS=[['es','Español'],['en','Inglés'],['pt','Portugués'],['xx','Otro']];
+const VOCES=[['hombre','Hombre'],['mujer','Mujer'],['duo','Dúo'],['trio','Trío']];
+const lg=s=>s.lang||(SM[s.id]||[])[0]||'';
+const vz=s=>s.voz||(SM[s.id]||[])[1]||'';
+const lab=(a,k)=>(a.find(x=>x[0]===k)||[0,k])[1];
+const opts=(a,cur,ph)=>(ph!==undefined?'<option value="">'+ph+'</option>':'')+a.map(x=>'<option value="'+x[0]+'"'+(x[0]===cur?' selected':'')+'>'+x[1]+'</option>').join('');
+const nz=t=>String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+const dec=t=>{const e=document.createElement('textarea');e.innerHTML=String(t||'');return e.value};
+const cleanT=t=>(t.replace(/[\(\[][^\)\]]*(karaoke|instrumental|letra|lyrics|pista)[^\)\]]*[\)\]]/gi,'').replace(/\s*[-|–]\s*karaoke.*$/i,'').replace(/\s+/g,' ').trim())||t;
+const ytOn=()=>!!cfg().ytKey&&cfg().ytClient!==false;
+const ytCache={};
+function ycGet(k){try{const o=JSON.parse(localStorage.getItem('rk_yc')||'{}')[k];return o&&Date.now()-o.t<216e5?o.v:null}catch(e){return null}}
+function ycSet(k,v){try{const o=JSON.parse(localStorage.getItem('rk_yc')||'{}'),ks=Object.keys(o);if(ks.length>30)delete o[ks.sort((a,b)=>o[a].t-o[b].t)[0]];o[k]={t:Date.now(),v:v};localStorage.setItem('rk_yc',JSON.stringify(o))}catch(e){}}
+async function ytSearch(q,o){o=o||{};const key=cfg().ytKey;if(!key)throw new Error('nokey');
+ const qq=o.raw?q:(/karaok|instrumental|pista/i.test(q)?q:q+' karaoke'),ck=qq+'|'+(o.lang||'')+'|'+(o.raw?'r':'k');const hit=ytCache[ck]||ycGet(ck);if(hit)return ytCache[ck]=hit;
+ try{if(Date.now()-(+localStorage.getItem('rk_qx')||0)<72e5)throw new Error('quotaExceeded')}catch(x){if(x.message==='quotaExceeded')throw x}
+ const lim=parseInt(cfg().ytLim);if(!o.noLimit&&lim>0){const now=Date.now();let h=[];try{h=JSON.parse(localStorage.getItem('rk_yh')||'[]').filter(t=>now-t<36e5)}catch(x){}
+  if(h.length>=lim){const e=new Error('limit');e.wait=Math.max(1,Math.ceil((36e5-(now-h[0]))/6e4));throw e}
+  h.push(now);try{localStorage.setItem('rk_yh',JSON.stringify(h))}catch(x){}}
+ const u='https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&videoEmbeddable=true&videoSyndicated=true&maxResults=12&q='+encodeURIComponent(qq)+(o.lang?'&relevanceLanguage='+o.lang:'')+'&key='+encodeURIComponent(key);
+ const r=await fetch(u),j=await r.json();
+ if(!r.ok){const er=j&&j.error&&j.error.errors&&j.error.errors[0],rs=(er&&er.reason)||('http'+r.status);if(rs==='quotaExceeded'){try{localStorage.setItem('rk_qx',Date.now())}catch(x){}}throw new Error(rs)}
+ const res=ytCache[ck]=(j.items||[]).filter(i=>i.id&&i.id.videoId).map(i=>{const t=i.snippet.thumbnails||{};return{id:i.id.videoId,title:dec(i.snippet.title),ch:dec(i.snippet.channelTitle),th:(t.medium||t.default||{}).url||''}});ycSet(ck,res);return res}
+function ytErr(e){const m=String(e&&e.message||e);if(m==='limit')return 'Hiciste varias búsquedas seguidas. Inténtalo de nuevo en '+e.wait+' min o elige del catálogo.';if(m==='quotaExceeded')return 'Se agotó el límite diario de búsquedas de YouTube. Usa el catálogo o inténtalo mañana.';if(/keyInvalid|badRequest|forbidden|accessNotConfigured|ipRefererBlocked|nokey/i.test(m))return 'La clave de YouTube no es válida o no tiene permiso en este sitio. Avisa al encargado.';return 'No se pudo buscar en YouTube. Revisa tu conexión e inténtalo de nuevo.'}
+function mark(id){(S._sv=S._sv||{})[id]=1;try{view.upd()}catch(e){}setTimeout(()=>{delete S._sv[id];try{view.upd()}catch(e){}},6000)}
+function modal(h){const m=document.createElement('div');m.className='modal';m.setAttribute('role','dialog');m.setAttribute('aria-modal','true');m.innerHTML='<div class="card">'+h+'<button class="btn" style="width:100%" data-x>Entendido</button></div>';m.onclick=e=>{if(e.target===m||e.target.closest('[data-x]'))m.remove()};document.body.appendChild(m);const b=m.querySelector('[data-x]');if(b)b.focus()}
+function seedAll(force){SEED.forEach(x=>{if(force||!S.songs.some(s=>s.id===x.id))store.set('songs',x.id,{title:x.title,artist:x.artist,video:x.video,lang:SM[x.id][0],voz:SM[x.id][1]})});if(force)toast('20 temas cargados')}
+function grad(a){let h=0;for(const c of String(a))h=(h*31+c.charCodeAt(0))%360;return 'linear-gradient(135deg,hsl('+h+',70%,55%),hsl('+((h+50)%360)+',70%,38%))'}
+async function verify(){toast('Verificando videos…');let ok=0,bad=0,unk=0;for(const s of S.songs){if(!s.video)continue;try{const r=await fetch('https://www.youtube.com/oembed?format=json&url='+encodeURIComponent('https://www.youtube.com/watch?v='+s.video));if(r.ok){ok++;if(s.bad)store.set('songs',s.id,Object.assign({},s,{bad:false}))}else{bad++;store.set('songs',s.id,Object.assign({},s,{bad:true}))}}catch(e){unk++}}toast(ok||bad?ok+' correctos, '+bad+' con problema':'Este navegador no permite verificar; usa «Probar» en cada tema')}
+const PAGE=document.documentElement.dataset.page||'home';
+const stats=()=>{const d=S.queue.filter(x=>x.status==='done').length,p=S.queue.filter(x=>x.prio&&x.paid).length*(+cfg().price||0);return '<div class="stats"><div class="card"><b>'+waiting().length+'</b><span class="mut small">En espera</span></div><div class="card"><b>'+d+'</b><span class="mut small">Cantadas</span></div><div class="card"><b>Bs '+p+'</b><span class="mut small">Premium</span></div></div>'};
+function pickMesa(){$('#app').innerHTML=head(cfg().bar)+'<div class="wrap" style="text-align:center">'+vinyl(110)+'<h2 style="margin:14px 0">¿En qué mesa estás?</h2><div class="card stack"><input id="mn" type="number" min="1" placeholder="Número de mesa" aria-label="Número de mesa"><button class="btn" id="go">Entrar</button></div></div>';$('#go').onclick=()=>{const n=parseInt($('#mn').value);if(n>0)location.search='?mesa='+n;else toast('Escribe el número de mesa')};view={upd(){}}}
+function burst(k){const d=document.createElement('div');d.className='fl';d.style.left=(8+Math.random()*84)+'%';d.innerHTML=(k.e||'👏')+'<small>Mesa '+esc(k.mesa)+'</small>';document.body.appendChild(d);setTimeout(()=>d.remove(),3100);cc++;const el=$('#cc');if(el)el.textContent=cc+' aplausos'}
+function announce(n){const o=document.createElement('div');o.className='ann';o.innerHTML=n.modo==='rockola'?'<div><small>ROCKOLA · PIDIÓ LA MESA '+esc(n.mesa)+'</small><h2>'+esc(n.title)+'</h2><p>'+ic('note',28)+' '+esc(n.artist)+'</p></div>':'<div><small>MESA '+esc(n.mesa)+' AL ESCENARIO</small><h2>'+esc(n.singer)+'</h2><p>'+ic('note',28)+' '+esc(n.title)+' · '+esc(n.artist)+'</p></div>';document.body.appendChild(o);
+ const col=['#ff3d6e','#e9b44c','#4ad6a0','#6aa8ff','#ffffff'],f=document.createElement('div');f.className='conf';f.innerHTML=Array.from({length:44},()=>'<i style="left:'+Math.random()*100+'%;background:'+col[Math.random()*5|0]+';animation-delay:'+(Math.random()*1.2).toFixed(2)+'s"></i>').join('');document.body.appendChild(f);setTimeout(()=>{o.remove();f.remove()},3900)}
+
+let store,user=null,view={upd(){}},isAdmin=false;
+const $=(s,r=document)=>r.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const cfg=()=>Object.assign({},DEF,S.cfg.find(r=>r.id==='main')||{});
+const waiting=()=>S.queue.filter(q=>q.status==='wait'&&!(q.prio&&!q.paid)).sort((a,b)=>(b.prio?1:0)-(a.prio?1:0)||a.ts-b.ts);
+const held=()=>S.queue.filter(q=>q.status==='wait'&&q.prio&&!q.paid).sort((a,b)=>a.ts-b.ts);
+const nowP=()=>S.queue.find(q=>q.status==='now');
+const upd=(q,p)=>store.set('queue',q.id,Object.assign({},q,p));
+const uid=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2800)}
+function ytId(u){u=String(u||'');const m=u.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/);return m?m[1]:(/^[\w-]{11}$/.test(u)?u:'')}
+
+/* ---------- almacenamiento: nube compartida (db) o modo local ---------- */
+function localStore(){const mem={},subs={};
+ const load=n=>{try{mem[n]=JSON.parse(localStorage.getItem('rk_'+n)||'{}')}catch(e){mem[n]=mem[n]||{}}};
+ const rows=n=>Object.entries(mem[n]).map(([id,v])=>Object.assign({},v,{id}));
+ const emit=n=>(subs[n]||[]).forEach(f=>f(rows(n)));
+ const save=n=>{try{localStorage.setItem('rk_'+n,JSON.stringify(mem[n]))}catch(e){}};
+ addEventListener('storage',e=>{if(e.key&&e.key.indexOf('rk_')===0){const n=e.key.slice(3);load(n);emit(n)}});
+ return{mode:'local',sub(n,f){load(n);(subs[n]=subs[n]||[]).push(f);f(rows(n))},
+  set(n,id,d){load(n);mem[n][id]=d;save(n);emit(n);return true},del(n,id){load(n);delete mem[n][id];save(n);emit(n)}}}
+const FB={apiKey:"AIzaSyD1Xpv_gCCY0LXRoyC7r_veJYmQqVhRlcU",authDomain:"rockolaqr.firebaseapp.com",projectId:"rockolaqr",storageBucket:"rockolaqr.firebasestorage.app",messagingSenderId:"48675212571",appId:"1:48675212571:web:9b2f0e902cdb196b6597be"};
+async function fireStore(){
+ const A=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
+ const F=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+ const db=F.getFirestore(A.initializeApp(FB));
+ return{mode:'cloud',
+  sub(n,f){F.onSnapshot(F.collection(db,n),sn=>f(sn.docs.map(d=>Object.assign({},d.data(),{id:d.id}))),e=>toast('Error de nube: '+e.code))},
+  set(n,id,d){const o=Object.assign({},d);delete o.id;return F.setDoc(F.doc(db,n,id),o).then(()=>true).catch(e=>{toast('No se pudo guardar: '+e.code);return false})},
+  del(n,id){return F.deleteDoc(F.doc(db,n,id)).catch(e=>toast('No se pudo borrar: '+e.code))}}}
+
+/* ---------- acciones ---------- */
+function request(song,mesa,singer,prio,modo){
+ const c=cfg(),mine=S.queue.filter(q=>q.mesa==mesa&&q.status==='wait').length;
+ if(mine>=c.max)return toast('Esta mesa ya tiene '+c.max+' pedidos en espera');
+ store.set('queue',uid('q'),{songId:song.id,title:song.title,artist:song.artist,video:song.video||'',singer:singer||('Mesa '+mesa),mesa:+mesa,prio:!!prio,paid:false,modo:modo?'rockola':'',status:'wait',ts:Date.now()});
+ toast(window._off?'Sin conexión: tu pedido se enviará cuando vuelva el internet.':modo?'Pedido enviado. ¡Atento a la pantalla!':prio?'Pedido enviado. Paga en caja para activar la prioridad':'Pedido enviado. ¡Prepárate para cantar!')}
+function next(){const n=nowP();if(n)upd(n,{status:'done',doneAt:Date.now()});const w=waiting()[0];if(w)upd(w,{status:'now',startAt:Date.now()})}
+function qrSvg(t){try{const q=qrcode(0,'M');q.addData(t);q.make();return q.createSvgTag(4,2)}catch(e){return '<p class="small mut">'+esc(t)+'</p>'}}
+const base=()=>location.href.split('#')[0];
+const root=()=>location.href.split(/[?#]/)[0].replace(/[^/]*$/,'');
+const head=(t,extra)=>'<div class="bar"><div class="brand">'+vinyl(36)+'<h1>'+esc(t)+'</h1></div><div>'+(extra||'')+'</div></div>';
+
+/* ---------- inicio ---------- */
+function home(){const A=$('#app');
+ A.innerHTML=head(cfg().bar)+'<div class="wrap" style="text-align:center">'+vinyl(120)+'<p class="mut">Elige cómo quieres abrir la rockola en este dispositivo.</p><div class="home">'+
+ '<a class="card" href="pantalla.html"><h3>Pantalla principal</h3><p class="mut small">Para el televisor o proyector: video, turno actual y próximos cantantes.</p></a>'+
+ '<a class="card" href="panel.html"><h3>Panel de control</h3><p class="mut small">Cola, catálogo, QR de mesas, prioridad premium y ajustes.</p></a>'+
+ '<div class="card"><h3>Pedir desde una mesa</h3><div class="row" style="margin-top:10px"><input id="mn" type="number" min="1" placeholder="Número de mesa" aria-label="Número de mesa"><button class="btn" id="go">Entrar</button></div></div></div>'+
+ '<p class="small mut" id="mode"></p></div>';
+ $('#go').onclick=()=>{const n=parseInt($('#mn').value);if(n>0)location.href='cliente.html?mesa='+n;else toast('Escribe el número de mesa')};
+ view={upd(){const m=$('#mode');if(m)m.textContent=store&&store.mode==='cloud'?'Conectado a la nube: todos los dispositivos comparten la cola.':'Modo local: los datos solo se comparten entre pestañas de este navegador.'}};view.upd()}
+
+/* ---------- mesa (cliente) ---------- */
+function guiaCliente(){return '<h2 style="font-size:22px">Cómo pedir tu canción</h2><ol class="steps"><li><span>Escribe tu nombre para que te llamen al escenario.</span></li><li><span>Escribe y pulsa <b>Buscar en el catálogo</b> para ver las canciones del local. También puedes filtrar por <b>idioma</b> y por <b>voz</b>: hombre, mujer, dúo o trío.</span></li><li><span>Toca <b>Cantar</b>. Con <b>Prioridad</b> pasas al frente de la cola y pagas en caja.</span></li><li><span>¿No está tu canción? Pulsa <b>Buscar en YouTube</b> (si ves el botón) para karaokes nuevos. Con <b>Versión rockola</b> buscas la canción original solo para escuchar y ver en la pantalla.</span></li><li><span>En <b>Tus pedidos</b> ves tu posición. Cuando diga «¡Es tu turno!», sube al escenario.</span></li><li><span>Mientras cantan otros, aplaude con los emojis de abajo.</span></li></ol>'}
+function mesa(n){const A=$('#app');let q='',art='',lang='',voz='',yt=null,ytq='',ytm='',tok=0;
+ let nm='';try{nm=localStorage.getItem('rk_name')||''}catch(e){}
+ A.innerHTML=head(cfg().bar,'<button class="btn ghost sm" id="hp">? Ayuda</button> <span class="tag p">Mesa '+n+'</span>')+'<div class="wrap stack">'+
+ '<div class="card stack"><input id="nm" placeholder="Tu nombre (para llamarte al escenario)" value="'+esc(nm)+'" maxlength="30" aria-label="Tu nombre">'+
+ '<input id="sq" type="search" placeholder="Escribe canción o intérprete" aria-label="Buscar"><div class="row"><button class="btn grow" id="kb">Buscar en el catálogo</button><button class="btn neon grow" id="yb" hidden>Buscar en YouTube</button></div><button class="btn ghost" id="rb" hidden style="width:100%">🎵 Versión rockola: solo escuchar y ver</button></div>'+
+ '<div class="card" id="yt" hidden></div><div class="card" id="fl"></div><div id="np"></div><h3 class="sec" id="st"></h3><div class="card" id="sl"></div><div class="card" id="my"></div><p class="small mut" style="text-align:center">Versión '+VER+'</p></div><div class="react" id="rx">'+['👏','🔥','❤️','🎉'].map(e=>'<button data-e="'+e+'" aria-label="Reaccionar '+e+'">'+e+'</button>').join('')+'</div>';
+ $('#hp').onclick=()=>modal(guiaCliente());
+ try{if(!localStorage.getItem('rk_g1')){localStorage.setItem('rk_g1','1');setTimeout(()=>modal(guiaCliente()),600)}}catch(e){}
+ let lr=0,cb=[];$('#rx').onclick=e=>{const b=e.target.closest('[data-e]');const now=Date.now();if(!b||now-lr<1200)return;cb=cb.filter(t=>now-t<60000);if(cb.length>=20)return toast('Muchos aplausos seguidos. ¡Espera un momento!');lr=now;cb.push(now);store.set('claps',uid('c'),{mesa:n,e:b.dataset.e,ts:Date.now()});try{navigator.vibrate&&navigator.vibrate(20)}catch(x){}};
+ $('#nm').oninput=e=>{try{localStorage.setItem('rk_name',e.target.value)}catch(x){}};
+ $('#sq').oninput=e=>{q=nz(e.target.value.trim());draw()};
+ $('#sq').onkeydown=e=>{if(e.key==='Enter')doCat()};
+ $('#kb').onclick=doCat;
+ $('#yb').onclick=()=>doYt();$('#rb').onclick=()=>doYt('rock');
+ $('#fl').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;if('a' in b.dataset)art=b.dataset.a;else if('lg' in b.dataset)lang=b.dataset.lg;else if('vz' in b.dataset)voz=b.dataset.vz;chips();draw()};
+ $('#sl').onclick=e=>{const b=e.target.closest('[data-id]');if(!b)return;const s=songs().find(x=>x.id===b.dataset.id);if(s)request(s,n,$('#nm').value.trim(),b.dataset.p==='1')};
+ $('#yt').onclick=e=>{const b=e.target.closest('[data-y]');if(!b||!Array.isArray(yt))return;const r=yt[+b.dataset.y];if(r)request({id:'yt_'+r.id,title:cleanT(r.title),artist:r.ch,video:r.id},n,$('#nm').value.trim(),b.dataset.p==='1',ytm==='rock')};
+ function grp(t,items,cur,k){return '<div class="fgrp"><small>'+t+'</small>'+items.map(x=>'<button class="chip'+(cur===x[0]?' on':'')+'" data-'+k+'="'+esc(x[0])+'">'+esc(x[1])+'</button>').join('')+'</div>'}
+ function chips(){const a=[...new Set(songs().map(s=>s.artist))].sort();
+  $('#fl').innerHTML=grp('Idioma',[['','Todos']].concat(LANGS),lang,'lg')+grp('Voz',[['','Todos']].concat(VOCES),voz,'vz')+grp('Artista',[['','Todos']].concat(a.map(x=>[x,x])),art,'a')}
+ function ytDraw(){const on=ytOn();$('#yb').hidden=!on;$('#rb').hidden=!on;const b=$('#yt');b.hidden=!on||yt==null;if(!on||yt==null)return;
+  let h='<h3 style="font-size:16px;margin-bottom:8px">'+(ytm==='rock'?'🎵 Rockola · versiones para escuchar y ver':'▶ Resultados de YouTube (karaoke)')+'</h3>';
+  if(yt==null)h+='<p class="mut small">¿No está tu canción? Escribe el artista o el título arriba y pulsa el botón «Buscar en YouTube».</p>';
+  else if(yt==='load')h+='<p class="mut">Buscando «'+esc(ytq)+'»…</p>';
+  else if(typeof yt==='string')h+='<p class="glow">'+esc(yt.slice(4))+'</p>';
+  else h+=yt.length?yt.map((r,i)=>'<div class="song">'+(r.th?'<img class="th" loading="lazy" alt="" src="'+esc(r.th)+'">':'')+'<div class="grow"><b>'+esc(cleanT(r.title))+'</b><div class="mut small">'+esc(r.ch)+'</div></div><button class="btn sm" data-y="'+i+'">'+(ytm==='rock'?ic('note',16)+' Poner':ic('mic',16)+' Cantar')+'</button>'+(cfg().premium?'<button class="btn neon sm" data-y="'+i+'" data-p="1">'+ic('crown',16)+' Prioridad Bs '+esc(cfg().price)+'</button>':'')+'</div>').join(''):'<p class="mut">Sin resultados para «'+esc(ytq)+'».</p>';
+  b.innerHTML=h}
+ function doCat(){draw();$('#st').scrollIntoView({behavior:'smooth',block:'start'})}
+ async function doYt(m){ytm=m||'';const t=$('#sq').value.trim();if(!t)return toast('Escribe un artista o una canción');ytq=t;yt='load';ytDraw();$('#yt').scrollIntoView({behavior:'smooth',block:'start'});const my=++tok;
+  try{const r=await ytSearch(t+(voz==='duo'?' dueto':voz==='trio'?' trío':''),{lang:lang&&lang!=='xx'?lang:'',raw:ytm==='rock'});if(my===tok)yt=r}catch(e){if(my===tok)yt='err:'+ytErr(e)}
+  if(my===tok)ytDraw()}
+ function draw(){const c=cfg(),l=songs().filter(s=>(!art||s.artist===art)&&(!lang||lg(s)===lang)&&(!voz||vz(s)===voz)&&(!q||nz(s.title+' '+s.artist).includes(q)));
+  $('#st').textContent='★ Catálogo · '+l.length+(l.length===1?' canción':' canciones');
+  $('#sl').innerHTML=l.length?l.map((s,i)=>'<div class="song"><span class="rk">'+(i+1)+'</span><span class="av" style="background:'+grad(s.artist)+'">'+esc(String(s.artist||'?')[0])+'</span><div class="grow"><b>'+esc(s.title)+'</b><div class="mut small">'+esc(s.artist)+(lg(s)?' · '+esc(lab(LANGS,lg(s))):'')+(vz(s)?' · '+esc(lab(VOCES,vz(s))):'')+'</div></div>'+
+   '<button class="btn sm" data-id="'+esc(s.id)+'">'+ic('mic',16)+' Cantar</button>'+(c.premium?'<button class="btn neon sm" data-id="'+esc(s.id)+'" data-p="1" title="Pasa al frente de la cola">'+ic('crown',16)+' Prioridad Bs '+esc(c.price)+'</button>':'')+'</div>').join(''):'<p class="mut">'+(S.songs.length?'No hay resultados en el catálogo.'+(ytOn()?' Prueba «Buscar en YouTube».':' Pídele al encargado que la agregue.'):'El catálogo está vacío. Pídele al encargado que cargue canciones.')+'</p>';
+  const w=waiting(),mine=S.queue.filter(x=>x.mesa==n&&x.status!=='done');
+  $('#my').innerHTML=(mine.some(x=>x.status==='now'&&x.modo!=='rockola')?'<div class="turn">'+ic('mic',22)+' ¡Es tu turno, sube al escenario!</div>':(mine.some(x=>x.status==='now')?'<div class="turn">'+ic('note',22)+' ¡Tu canción está sonando! Mira la pantalla</div>':''))+'<h3 style="font-size:16px;margin-bottom:8px">Tus pedidos</h3>'+(mine.length?mine.map(x=>{let st='';if(x.status==='now')st='<span class="tag w">'+(x.modo==='rockola'?'Sonando ahora':'¡Es tu turno!')+'</span>';else if(x.prio&&!x.paid)st='<span class="tag">Esperando pago</span>';else st='<span class="tag p">Posición '+(w.findIndex(y=>y.id===x.id)+1)+' · ~'+(4*(w.findIndex(y=>y.id===x.id)+1))+' min</span>';
+   return '<div class="song"><div class="grow"><b>'+(x.modo==='rockola'?'🎵 ':'')+esc(x.title)+'</b><div class="mut small">'+esc(x.artist)+'</div></div>'+st+(x.status==='wait'?'<button class="btn ghost sm" data-del="'+x.id+'">Cancelar</button>':'')+'</div>'}).join(''):'<p class="mut small">Aún no has pedido canciones.</p>')}
+ $('#my').onclick=e=>{const b=e.target.closest('[data-del]');if(b)store.del('queue',b.dataset.del)};
+ view={upd(){chips();draw();ytDraw();const n=nowP();$('#np').innerHTML=n?'<div class="np"><span class="eq"><i></i><i></i><i></i><i></i></span><div><small class="mut">'+(n.modo==='rockola'?'SUENA EN LA ROCKOLA':'EN EL ESCENARIO')+' · MESA '+esc(n.mesa)+'</small><br><b>'+(n.modo==='rockola'?'🎵 ':esc(n.singer)+' · ')+esc(n.title)+(n.modo==='rockola'?' · '+esc(n.artist):'')+'</b></div></div>':''}};view.upd()}
+
+/* ---------- pantalla principal ---------- */
+function pantalla(){const A=$('#app');let cur='',seen=new Set(),t0=Date.now();
+ A.innerHTML='<div class="tv"><main id="main"></main><aside id="side" class="stack"></aside></div><div class="ck" id="ck"></div><div class="tick"><span id="tk"></span></div><div class="camw" id="cw"><video id="cam" autoplay muted playsinline></video><b>● EN VIVO</b></div><button class="btn ghost sm" id="cb" style="position:fixed;left:12px;bottom:92px;display:none">Activar cámara</button>'+
+ '<button class="btn ghost sm" id="fs" style="position:fixed;left:12px;bottom:48px">Pantalla completa</button><button class="btn ghost sm" id="xc">✕ Salir de pantalla completa</button>';
+ let cine=false,mvT,lastT=0,ps=-2;
+ window.onNetBack=()=>{setTimeout(()=>{const f=$('#vd iframe');if(!f||!f.dataset.src||!f.src||ps===1)return;const t=Math.max(0,Math.floor(lastT)-2);f.src=f.dataset.src+(t>0?'&start='+t:'')},4000)};
+ const wl=()=>{try{navigator.wakeLock&&navigator.wakeLock.request('screen').catch(()=>{})}catch(e){}};wl();document.addEventListener('visibilitychange',()=>{if(!document.hidden)wl()});
+ const wake=()=>{document.body.classList.add('mv');clearTimeout(mvT);mvT=setTimeout(()=>document.body.classList.remove('mv'),3000)};
+ addEventListener('mousemove',wake);addEventListener('touchstart',wake);
+ function cineOff(){cine=false;document.body.classList.remove('cine-on');const v=$('#vd');if(v)v.classList.remove('cine');document.querySelectorAll('.lt').forEach(x=>x.remove())}
+ function cineOn(n){if(!cfg().fsAuto)return;const v=$('#vd');if(!v||!$('#vd iframe'))return;cine=true;v.classList.add('cine');document.body.classList.add('cine-on');wake();
+  try{if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{})}catch(e){}
+  const l=document.createElement('div');l.className='lt';l.innerHTML=n.modo==='rockola'?'<small>ROCKOLA · MESA '+esc(n.mesa)+'</small><br><b>'+esc(n.title)+'</b> · '+esc(n.artist):'<small>MESA '+esc(n.mesa)+'</small><br><b>'+esc(n.singer)+'</b> · '+esc(n.title);document.body.appendChild(l);setTimeout(()=>l.remove(),8000)}
+ $('#xc').onclick=()=>{cineOff();try{if(document.fullscreenElement)document.exitFullscreen()}catch(e){}};
+ $('#fs').onclick=()=>{try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}catch(e){}};
+ document.onfullscreenchange=()=>{const f=$('#fs');if(f)f.style.display=document.fullscreenElement?'none':''};
+ let camOn=false;const clock=()=>{const k=$('#ck');if(k)k.textContent=new Date().toLocaleTimeString('es-BO',{hour:'2-digit',minute:'2-digit'})};clock();setInterval(clock,1000);
+ $('#cb').onclick=()=>navigator.mediaDevices.getUserMedia({video:{width:640,height:480,facingMode:'user'},audio:false}).then(st=>{$('#cam').srcObject=st;camOn=true;view.upd()}).catch(()=>toast('No se pudo abrir la cámara'));
+ function camUi(n){const c=cfg(),cw=$('#cw'),cb=$('#cb');cw.className='camw pos-'+c.camPos;cw.style.display=(c.cam&&camOn&&n)?'block':'none';cb.style.display=(c.cam&&!camOn)?'inline-flex':'none';if(!c.cam&&camOn){const st=$('#cam').srcObject;st&&st.getTracks().forEach(t=>t.stop());$('#cam').srcObject=null;camOn=false}}
+ window.onmessage=e=>{if(!/youtube/.test(e.origin))return;let d;try{d=JSON.parse(e.data)}catch(x){return}
+  if(d&&d.event==='onStateChange')ps=d.info;if(d&&d.event==='infoDelivery'&&d.info){if(typeof d.info.currentTime==='number')lastT=d.info.currentTime;if(typeof d.info.playerState==='number')ps=d.info.playerState}
+  if(d&&d.event==='onStateChange'&&d.info===0&&cfg().auto)next();
+  if(d&&d.event==='onError'){cineOff();const n=nowP();if(n){const s=S.songs.find(x=>x.id===n.songId);if(s&&!s.bad)store.set('songs',s.id,Object.assign({},s,{bad:true}));
+   const v=$('#vd');if(v&&!$('#vw'))v.insertAdjacentHTML('afterend','<p id="vw" class="glow" style="margin:10px 0 0">Este video no permite reproducirse en otras páginas. Pulsa «Mirar en YouTube» o elige una versión karaoke.</p>')}}};
+ view={upd(){const n=nowP(),c=cfg(),w=waiting();camUi(n);const tk=$('#tk');if(tk){const t=w.length?w.map(x=>(x.modo==='rockola'?'🎵 ':'')+x.singer+' — '+x.title).join('     ♪     '):'Escanea el QR y pide tu canción';tk.textContent=t+'     ♪     '+t}
+  S.claps.filter(k=>!seen.has(k.id)&&k.ts>=t0-5000).forEach(k=>{seen.add(k.id);burst(k);store.del('claps',k.id)});
+  if(n){const id=ytId(n.video);
+   if(cur!==n.id){cur=n.id;cineOff();lastT=0;ps=-2;$('#main').innerHTML='<div class="vid" id="vd">'+(id?'<iframe title="Video" allow="autoplay; encrypted-media; fullscreen" data-src="https://www.youtube-nocookie.com/embed/'+id+'?autoplay=1&enablejsapi=1&rel=0&origin='+encodeURIComponent(location.origin)+'"></iframe>':'<div class="idle" style="height:100%;border:0"><div><h2 class="glow">Sin video</h2><p class="mut">Esta canción no tiene enlace de YouTube. Usa «Siguiente» en el panel.</p></div></div>')+'</div><div class="now" id="nw"></div><div class="mut" id="ns"></div><p><span class="eq"><i></i><i></i><i></i><i></i></span> <b id="cc">0 aplausos</b></p><p class="small"><a id="yl" target="_blank" rel="noopener" style="color:var(--brass)"></a></p>';
+    const f=$('#vd iframe');if(f)f.onload=()=>{try{f.contentWindow.postMessage(JSON.stringify({event:'listening',id:1,channel:'widget'}),'*')}catch(x){}};cc=0;announce(n);if(f){const my=n.id;setTimeout(()=>{if(cur===my){f.src=f.dataset.src;cineOn(n)}},3800)}}
+   $('#nw').textContent=n.title;$('#ns').textContent=n.modo==='rockola'?n.artist+' · pedida por la mesa '+n.mesa:n.artist+' · canta '+n.singer+' (mesa '+n.mesa+')';const yl=$('#yl');yl.href=id?'https://www.youtube.com/watch?v='+id:'https://www.youtube.com/results?search_query='+encodeURIComponent(n.title+' '+n.artist+' karaoke');yl.textContent=id?'¿No carga el video? Ábrelo en YouTube':'Buscar karaoke de esta canción en YouTube'}
+  else{cur='';cineOff();const top={};S.queue.filter(q=>q.status==='done').forEach(q=>top[q.singer]=(top[q.singer]||0)+1);const t=Object.entries(top).sort((a,b)=>b[1]-a[1]).slice(0,5);
+   $('#main').innerHTML='<h1>'+esc(c.bar)+'</h1><div class="idle" style="margin-top:16px"><div>'+vinyl(140)+'<h2 class="glow" style="font-size:clamp(26px,4vw,52px)">Escanea el QR de tu mesa</h2><p class="mut">Elige tu canción desde el celular y sube al escenario.</p>'+(t.length?'<p style="margin-top:18px"><b>Más cantores de la noche</b><br>'+t.map(x=>esc(x[0])+' ('+x[1]+')').join(' · ')+'</p>':'')+'</div></div>'}
+  $('#side').innerHTML='<div class="card"><h3 style="font-size:18px;color:var(--brass)">Próximos</h3>'+(w.length?w.slice(0,6).map((x,i)=>'<div class="song"><span class="tag '+(x.prio?'p':'')+'">'+(i+1)+'</span><div class="grow"><b>'+(x.modo==='rockola'?'🎵 ':'')+esc(x.singer)+'</b><div class="mut small">'+esc(x.title)+' · '+esc(x.artist)+'</div></div></div>').join(''):'<p class="mut">La cola está libre. ¡Anímate a pedir!</p>')+'</div><div class="card" style="text-align:center">'+qrSvg(root())+'<p class="small mut" style="margin:6px 0 0">Escanea y pide tu canción</p></div>'}};view.upd()}
+
+/* ---------- panel de control ---------- */
+function guiaOperador(){const li=t=>'<li><span>'+t+'</span></li>';
+ return '<div class="card"><h3 style="font-size:18px">Guía rápida del operador</h3>'+
+ '<h3 class="sec">Antes de abrir el local</h3><ol class="steps">'+
+ li('Entra a <b>Cola</b> y confirma que arriba diga «☁ Conectado a la nube». Si dice «Modo local», los celulares no ven la cola. Cambia también el PIN en Ajustes.')+
+ li('Abre <b>pantalla.html</b> en el televisor o proyector y pulsa <b>Pantalla completa</b> una sola vez. Desde ahí, cada video se pone a pantalla completa solo, justo después de presentar al cantante. Si el navegador no lo permite, usa F11.')+
+ li('En <b>Catálogo</b> toca <b>Cargar los 20 temas</b> o agrega los tuyos. Elige idioma y voz (hombre, mujer, dúo, trío): con eso los clientes filtran.')+
+ li('Pega el enlace de YouTube de cada tema y toca <b>Guardar video</b>. Sabrás que se guardó porque aparece «✓ ¡Guardado!» y la canción queda con la etiqueta verde «✓ Video guardado». Sin esa etiqueta, la canción no tiene video.')+
+ li('En <b>Buscar karaoke</b> busca por artista o título, prueba el video y toca <b>Agregar al catálogo</b>.')+
+ li('En <b>Mesas y QR</b> imprime los QR y pégalos en cada mesa.')+'</ol>'+
+ '<h3 class="sec">Durante la noche</h3><ol class="steps">'+
+ li('En <b>Cola</b>, los pedidos con prioridad esperan en «Prioridad por confirmar pago». Cobra y toca <b>Confirmar pago</b>.')+
+ li('El siguiente cantante entra solo cuando termina el video. Si hace falta, toca <b>Siguiente</b>.')+
+ li('Si un video no carga (bloqueado fuera de YouTube), ve a Catálogo, toca <b>Buscar video</b>, elige otro y guárdalo.')+
+ li('Para salir de la pantalla completa en el televisor, toca o mueve el mouse y pulsa «Salir de pantalla completa».')+'</ol>'+
+ '<h3 class="sec">Si se corta el internet</h3><ol class="steps">'+
+ li('Aparece un aviso rojo «Sin conexión» arriba, en el televisor, el panel y los celulares.')+
+ li('La música se detiene. Los pedidos hechos en ese momento se envían solos cuando vuelve el internet.')+
+ li('Al volver aparece «✓ Conexión recuperada» y la pantalla intenta reanudar el video donde iba. Si no lo logra, toca <b>Siguiente</b> en la Cola.')+
+ li('Si recargas una página sin internet, entra en «Modo local». Cuando vuelva la conexión, recárgala.')+'</ol>'+
+ '<h3 class="sec">Crear la clave de búsqueda de YouTube (gratis)</h3><ol class="steps">'+
+ li('Entra a <b>console.cloud.google.com</b> y crea un proyecto.')+
+ li('En «APIs y servicios» activa <b>YouTube Data API v3</b>.')+
+ li('En «Credenciales» crea una <b>clave de API</b>.')+
+ li('Restríngela a tu sitio web (tu dominio) y solo a YouTube Data API v3.')+
+ li('Pégala en <b>Ajustes</b> y guarda. Los clientes también podrán buscar desde su celular.')+'</ol>'+
+ '<p class="small mut">Cada búsqueda gasta 100 unidades de la cuota diaria gratuita (por defecto 10 000, unas 100 búsquedas al día entre todos). Si se agota, el catálogo sigue funcionando. Para cuidarla, cada celular tiene un límite de búsquedas por hora (se cambia en Ajustes) y las búsquedas repetidas no gastan cuota.</p></div><div class="card" style="margin-top:12px"><h3 style="font-size:18px">Versión '+VER+'</h3>'+LOG.map(v=>'<h3 class="sec">v'+v[0]+' · '+v[1]+'</h3><ul class="small" style="margin:0;padding-left:18px">'+v[2].map(x=>'<li>'+x+'</li>').join('')+'</ul>').join('')+'</div>'}
+
+function estado(){const c=cfg();let h=store&&store.mode==='cloud'?'<span class="tag ok">☁ Conectado a la nube</span>':'<span class="tag w">⚠ Modo local: los celulares NO ven esta cola</span>';if(c.pin==='1234')h+='<span class="tag w">Cambia el PIN en Ajustes</span>';if(!c.ytKey)h+='<span class="tag">Sin clave de YouTube</span>';return '<div class="row" style="gap:6px">'+h+'</div>'}
+function panel(){const A=$('#app');
+ if(!isAdmin&&sessionStorageOK('rk_ok')!=='1'){A.innerHTML=head('Panel')+'<div class="wrap"><div class="card stack"><h3>Ingresa el PIN</h3><input id="pin" type="password" inputmode="numeric" aria-label="PIN"><button class="btn" id="ok">Entrar</button><p class="small mut">PIN inicial: 1234. Cámbialo en Ajustes.</p></div></div>';
+  $('#ok').onclick=()=>{if($('#pin').value===cfg().pin){sessionStorageOK('rk_ok','1');panel()}else toast('PIN incorrecto')};view={upd(){}};return}
+ const T={cola:'Cola',cat:'Catálogo',yt:'Buscar karaoke',qr:'Mesas y QR',aj:'Ajustes',gd:'Guía'};let tab='cola',cur,sig='',yres=null;
+ A.innerHTML=head(cfg().bar+' · panel','<span class="tag">v'+VER+'</span> <a class="btn ghost sm" href="pantalla.html" target="_blank">Abrir pantalla</a>')+'<div class="wrap"><div class="tabs" id="tb">'+Object.entries(T).map(([k,v])=>'<button class="chip" data-t="'+k+'">'+v+'</button>').join('')+'</div><div id="pb"></div></div>';
+ $('#tb').onclick=e=>{const b=e.target.closest('[data-t]');if(b){tab=b.dataset.t;show()}};
+ const tabs={
+ cola:{mount(){$('#pb').innerHTML='<div id="pc" class="stack"></div>';$('#pc').onclick=e=>{const b=e.target.closest('[data-a]');if(!b)return;const q=S.queue.find(x=>x.id===b.dataset.id),a=b.dataset.a;
+   if(a==='next')next();else if(a==='pay')upd(q,{paid:true});else if(a==='rm')store.del('queue',q.id);else if(a==='clean')S.queue.filter(x=>x.status==='done').forEach(x=>store.del('queue',x.id))}},
+  upd(){const n=nowP(),w=waiting(),h=held();$('#pc').innerHTML=estado()+stats()+'<div class="card"><div class="row"><div class="grow"><span class="mut small">Sonando ahora</span><h3 style="font-size:18px">'+(n?esc(n.title):'Nadie en el escenario')+'</h3>'+(n?'<div class="mut small">'+esc(n.artist)+' · '+esc(n.singer)+' (mesa '+n.mesa+')</div>':'')+'</div><button class="btn neon" data-a="next">Siguiente</button></div></div>'+
+   (h.length?'<div class="card"><h3 style="font-size:16px">Prioridad por confirmar pago</h3>'+h.map(x=>'<div class="song"><div class="grow"><b>'+esc(x.title)+'</b><div class="mut small">Mesa '+x.mesa+' · '+esc(x.singer)+' · Bs '+esc(cfg().price)+'</div></div><button class="btn sm" data-a="pay" data-id="'+x.id+'">Confirmar pago</button><button class="btn ghost sm" data-a="rm" data-id="'+x.id+'">Quitar</button></div>').join('')+'</div>':'')+
+   '<div class="card"><h3 style="font-size:16px">En espera ('+w.length+')</h3>'+(w.length?w.map((x,i)=>'<div class="song"><span class="tag '+(x.prio?'p':'')+'">'+(i+1)+'</span><div class="grow"><b>'+(x.modo==='rockola'?'🎵 ':'')+esc(x.title)+'</b><div class="mut small">'+esc(x.artist)+' · mesa '+x.mesa+' · '+esc(x.singer)+'</div></div><button class="btn ghost sm" data-a="rm" data-id="'+x.id+'">Quitar</button></div>').join(''):'<p class="mut small">No hay pedidos en espera.</p>')+'</div><button class="btn ghost sm" data-a="clean">Limpiar historial</button>'}},
+ cat:{mount(){sig='';$('#pb').innerHTML='<div class="card stack"><h3 style="font-size:16px">Agregar canción</h3><input id="t" placeholder="Título"><input id="a" placeholder="Intérprete"><input id="v" placeholder="Enlace de YouTube (opcional)"><div class="row"><select id="l1" aria-label="Idioma">'+opts(LANGS,'es')+'</select><select id="v1" aria-label="Voz">'+opts(VOCES,'','Voz sin definir')+'</select></div><div class="row"><button class="btn" id="add">Agregar</button><button class="btn ghost" id="demo">Cargar los 20 temas</button><button class="btn ghost" id="vf">Verificar videos</button></div></div><div class="card" id="sl" style="margin-top:12px"></div>';
+   $('#add').onclick=()=>{const t=$('#t').value.trim(),a=$('#a').value.trim(),v=$('#v').value.trim();if(!t||!a)return toast('Escribe título e intérprete');if(v&&!ytId(v))return toast('El enlace de YouTube no es válido');
+    const id=uid('s'),bt=$('#add');bt.disabled=true;Promise.resolve(store.set('songs',id,{title:t,artist:a,video:ytId(v),lang:$('#l1').value,voz:$('#v1').value})).then(ok=>{bt.disabled=false;if(ok===false)return;$('#t').value=$('#a').value=$('#v').value='';mark(id);toast('✓ Canción guardada en el catálogo: '+t)})};
+   $('#demo').onclick=()=>seedAll(true);$('#vf').onclick=verify;
+   function saveVideo(song,id,btn){btn.disabled=true;btn.textContent='Guardando…';const w=setTimeout(()=>toast('Aún sin confirmar. Revisa tu conexión a internet.'),8000);
+    Promise.resolve(store.set('songs',song.id,Object.assign({},song,{video:id,bad:false}))).then(ok=>{clearTimeout(w);if(ok===false){btn.disabled=false;btn.textContent='Guardar video';return}mark(song.id);toast('✓ Video guardado: '+song.title)})}
+   $('#sl').onclick=e=>{const sv=e.target.closest('[data-sv]');if(sv){const inp=$('[data-vi="'+sv.dataset.sv+'"]'),id=ytId(inp.value),song=S.songs.find(x=>x.id===sv.dataset.sv);if(!id)return toast('Enlace de YouTube no válido');saveVideo(song,id,sv);return}
+    const b=e.target.closest('[data-rm]');if(b){const s=S.songs.find(x=>x.id===b.dataset.rm);if(s&&confirm('¿Borrar «'+s.title+'» del catálogo?'))store.del('songs',s.id)}};
+   $('#sl').onkeydown=e=>{if(e.key==='Enter'&&e.target.dataset.vi){const b=$('[data-sv="'+e.target.dataset.vi+'"]');if(b)b.click()}};
+   $('#sl').onchange=e=>{const el=e.target,k=el.dataset.lg?'lang':el.dataset.vz?'voz':'';if(!k)return;const id=el.dataset.lg||el.dataset.vz,song=S.songs.find(x=>x.id===id);if(!song)return;
+    const nu=Object.assign({},song,{lang:lg(song),voz:vz(song)});nu[k]=el.value;Promise.resolve(store.set('songs',id,nu)).then(ok=>{if(ok!==false)toast('✓ Guardado: '+song.title)})}},
+  upd(){if(S._l&&S._l.songs&&!S.songs.length&&!window._sd){window._sd=1;seedAll()}
+   const g=S.songs.map(s=>[s.id,s.title,s.artist,s.video,s.bad,lg(s),vz(s)].join('~')).join('|')+'#'+Object.keys(S._sv||{}).join();if(g===sig)return;sig=g;
+   $('#sl').innerHTML=S.songs.length?S.songs.slice().sort((a,b)=>a.artist.localeCompare(b.artist)).map(s=>{const fr=S._sv&&S._sv[s.id];return '<div class="song'+(fr?' flash':'')+'"><div class="grow"><b>'+esc(s.title)+'</b><div class="mut small">'+esc(s.artist)+'</div></div>'+
+    (s.bad?'<span class="tag w" title="Este video no se puede reproducir en otras páginas. Pega otro.">⚠ Video bloqueado</span>':s.video?'<span class="tag ok">'+(fr?'✓ ¡Guardado!':'✓ Video guardado')+'</span>':'<span class="tag">'+(fr?'✓ ¡Guardada! · ':'')+'Sin video</span>')+
+    '<select data-lg="'+s.id+'" aria-label="Idioma">'+opts(LANGS,lg(s),'Idioma ?')+'</select><select data-vz="'+s.id+'" aria-label="Voz">'+opts(VOCES,vz(s),'Voz ?')+'</select>'+
+    (s.video?'<a class="btn ghost sm" target="_blank" rel="noopener" href="https://www.youtube.com/watch?v='+esc(s.video)+'">Probar</a>':'')+'<a class="btn ghost sm" target="_blank" rel="noopener" href="https://www.youtube.com/results?search_query='+encodeURIComponent(s.title+' '+s.artist+' karaoke')+'">Buscar video</a><button class="btn ghost sm" data-rm="'+s.id+'">Borrar</button><input data-vi="'+s.id+'" placeholder="Pegar enlace de YouTube" style="flex:1 1 160px" aria-label="Enlace de YouTube"><button class="btn sm" data-sv="'+s.id+'">Guardar video</button></div>'}).join(''):'<p class="mut">Catálogo vacío. Agrega canciones o carga los ejemplos.</p>'}},
+ yt:{mount(){sig='';const c=cfg();$('#pb').innerHTML=(c.ytKey?'':'<div class="card" style="border-color:var(--neon);margin-bottom:12px"><b>Falta la clave de YouTube</b><p class="small mut" style="margin:6px 0 0">Sin ella no se puede buscar aquí. Mientras tanto usa «Abrir en YouTube», copia el enlace del video y pégalo en Catálogo. La pestaña Guía explica cómo crear la clave (es gratis).</p></div>')+
+   '<div class="card stack"><h3 style="font-size:16px">Buscar karaoke nuevo</h3><input id="ya" placeholder="Artista (ej. Los Bukis)" aria-label="Artista"><input id="ytt" placeholder="Canción (opcional)" aria-label="Canción"><div class="row"><select id="yl" aria-label="Idioma">'+opts(LANGS,'es')+'</select><select id="yv" aria-label="Voz">'+opts(VOCES,'','Voz sin definir')+'</select></div><div class="row"><button class="btn" id="ys">Buscar</button><a class="btn ghost" id="yo" target="_blank" rel="noopener">Abrir en YouTube</a></div><p class="small mut" style="margin:0">El idioma y la voz se aplican a las canciones que agregues.</p></div><div class="card" id="yr" style="margin-top:12px"></div>';
+   const qs=()=>($('#ya').value.trim()+' '+$('#ytt').value.trim()).trim();
+   const go=async()=>{const qq=qs();if(!qq)return toast('Escribe un artista o una canción');if(!cfg().ytKey)return toast('Falta la clave de YouTube en Ajustes');yres='load';sig='';cur.upd();
+    try{yres=await ytSearch(qq,{lang:$('#yl').value&&$('#yl').value!=='xx'?$('#yl').value:'',noLimit:true});yres.q=qq}catch(e){yres='err:'+ytErr(e)}sig='';cur.upd()};
+   $('#ys').onclick=go;$('#ya').onkeydown=$('#ytt').onkeydown=e=>{if(e.key==='Enter')go()};
+   $('#yo').onclick=e=>{e.currentTarget.href='https://www.youtube.com/results?search_query='+encodeURIComponent((qs()||'karaoke')+' karaoke')};
+   $('#yr').onclick=e=>{const b=e.target.closest('[data-add]');if(!b)return;const i=+b.dataset.add,x=yres[i],t=$('[data-ti="'+i+'"]').value.trim(),a=$('[data-ai="'+i+'"]').value.trim();if(!t||!a)return toast('Escribe título e intérprete');
+    const id=uid('s');b.disabled=true;b.textContent='Guardando…';Promise.resolve(store.set('songs',id,{title:t,artist:a,video:x.id,lang:$('#yl').value,voz:$('#yv').value})).then(ok=>{if(ok===false){b.disabled=false;b.textContent='Agregar al catálogo';return}mark(id);toast('✓ Agregada al catálogo: '+t)})}},
+  upd(){const r=$('#yr');if(!r)return;const g=(Array.isArray(yres)?yres.map(x=>x.id).join():String(yres))+'|'+S.songs.length+'|'+Object.keys(S._sv||{}).join();if(g===sig)return;sig=g;
+   if(yres==null)r.innerHTML='<p class="mut small">Escribe un artista o una canción y pulsa Buscar. Se buscan videos de karaoke que permiten reproducirse en la pantalla.</p>';
+   else if(yres==='load')r.innerHTML='<p class="mut">Buscando…</p>';
+   else if(typeof yres==='string')r.innerHTML='<p class="glow">'+esc(yres.slice(4))+'</p>';
+   else{const have=new Set(S.songs.map(s=>s.video)),art=$('#ya')?$('#ya').value.trim():'';r.innerHTML=yres.length?yres.map((x,i)=>'<div class="song">'+(x.th?'<img class="th" loading="lazy" alt="" src="'+esc(x.th)+'">':'')+'<div class="grow"><b>'+esc(x.title)+'</b><div class="mut small">'+esc(x.ch)+'</div></div><a class="btn ghost sm" target="_blank" rel="noopener" href="https://www.youtube.com/watch?v='+esc(x.id)+'">Probar</a>'+
+     (have.has(x.id)?'<span class="tag ok">✓ En el catálogo</span>':'<input data-ti="'+i+'" value="'+esc(cleanT(x.title))+'" style="flex:1 1 150px" aria-label="Título"><input data-ai="'+i+'" value="'+esc(art)+'" placeholder="Intérprete" style="flex:1 1 120px" aria-label="Intérprete"><button class="btn sm" data-add="'+i+'">Agregar al catálogo</button>')+'</div>').join(''):'<p class="mut">Sin resultados. Prueba con otro artista o escribe el título.</p>'}}},
+
+ qr:{mount(){const c=cfg();$('#pb').innerHTML='<div class="row" style="margin-bottom:12px"><input id="nmz" type="number" min="1" max="60" value="'+esc(c.mesas)+'" aria-label="Cantidad de mesas"><button class="btn" id="gen">Generar QR</button><button class="btn ghost" onclick="print()">Imprimir</button></div><div class="qrs" id="qg"></div><p class="small mut">Cada QR abre la rockola ya ubicada en su mesa.</p>';
+   const g=()=>{const k=Math.min(60,Math.max(1,parseInt($('#nmz').value)||1));$('#qg').innerHTML=Array.from({length:k},(_,i)=>'<div class="card">'+qrSvg(root()+'?mesa='+(i+1))+'<b>Mesa '+(i+1)+'</b></div>').join('')};$('#gen').onclick=g;g()},upd(){}},
+ aj:{mount(){const c=cfg();$('#pb').innerHTML='<div class="card stack"><label>Nombre del local<input id="s1" value="'+esc(c.bar)+'"></label><label>Pedidos máximos por mesa<input id="s2" type="number" min="1" value="'+esc(c.max)+'"></label><label>Cantidad de mesas<input id="s3" type="number" min="1" value="'+esc(c.mesas)+'"></label>'+
+   '<label class="row"><input type="checkbox" id="s4" style="width:auto"'+(c.premium?' checked':'')+'> Activar versión premium (prioridad pagada)</label><label>Precio de la prioridad (Bs)<input id="s5" type="number" min="0" value="'+esc(c.price)+'"></label>'+
+   '<label class="row"><input type="checkbox" id="s6" style="width:auto"'+(c.auto?' checked':'')+'> Pasar al siguiente cuando termine el video</label>'+
+   '<label class="row"><input type="checkbox" id="s12" style="width:auto"'+(c.fsAuto?' checked':'')+'> Poner el video en pantalla completa después de presentar al cantante</label>'+
+   '<label class="row"><input type="checkbox" id="s8" style="width:auto"'+(c.cam?' checked':'')+'> Mostrar la cámara del cantante en la pantalla</label><label>Posición de la cámara<select id="s9">'+[['br','Abajo derecha'],['bl','Abajo izquierda'],['tr','Arriba derecha'],['tl','Arriba izquierda']].map(o=>'<option value="'+o[0]+'"'+(c.camPos===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select></label>'+
+   '<label class="row"><input type="checkbox" id="s11" style="width:auto"'+(c.ytClient!==false?' checked':'')+'> Permitir que los clientes busquen karaokes en YouTube</label><label>Clave de YouTube Data API<input id="s10" value="'+esc(c.ytKey)+'" placeholder="AIza…" autocomplete="off"></label><p class="small mut" style="margin:0">Sirve para buscar karaokes nuevos. La pestaña Guía explica cómo crearla. Restríngela a tu dominio en Google Cloud, porque los clientes la usan desde su celular.</p>'+
+   '<label>Búsquedas de YouTube por celular y por hora (0 = sin límite)<input id="s13" type="number" min="0" value="'+esc(c.ytLim)+'"></label><label>PIN del panel<input id="s7" value="'+esc(c.pin)+'"></label><button class="btn" id="sv">Guardar ajustes</button></div>';
+   $('#sv').onclick=()=>{const b=$('#sv');b.disabled=true;Promise.resolve(store.set('cfg','main',{bar:$('#s1').value.trim()||DEF.bar,max:+$('#s2').value||3,mesas:+$('#s3').value||12,premium:$('#s4').checked,price:+$('#s5').value||0,auto:$('#s6').checked,fsAuto:$('#s12').checked,cam:$('#s8').checked,camPos:$('#s9').value,ytClient:$('#s11').checked,ytKey:$('#s10').value.trim(),ytLim:(l=>isNaN(l)?5:Math.max(0,l))(parseInt($('#s13').value)),pin:$('#s7').value.trim()||'1234'})).then(ok=>{b.disabled=false;if(ok!==false)toast('✓ Ajustes guardados')})}},upd(){}},
+ gd:{mount(){$('#pb').innerHTML=guiaOperador()},upd(){}}};
+
+ function show(){cur=tabs[tab];[...$('#tb').children].forEach(b=>b.classList.toggle('on',b.dataset.t===tab));cur.mount();cur.upd()}
+ view={upd(){if(cur)cur.upd()}};show()}
+function sessionStorageOK(k,v){try{if(v!==undefined)sessionStorage.setItem(k,v);return sessionStorage.getItem(k)}catch(e){return window['_'+k]=v!==undefined?v:window['_'+k]}}
+
+/* ---------- conexión ---------- */
+function netWatch(){if(window._nw)return;window._nw=1;
+ const msg={cliente:'Sin conexión. Tus pedidos se enviarán cuando vuelva el internet.',panel:'Sin conexión. Los cambios se guardarán cuando vuelva el internet.',pantalla:'Sin conexión. La música continuará cuando vuelva el internet.'}[PAGE]||'Sin conexión.';
+ const el=document.createElement('div');el.id='off';el.setAttribute('role','status');el.hidden=true;document.body.appendChild(el);
+ let off=false,hide;
+ const set=v=>{if(v===off)return;off=v;window._off=v;clearTimeout(hide);if(v){el.className='';el.textContent='⚠ '+msg;el.hidden=false}else{el.className='back';el.textContent='✓ Conexión recuperada';el.hidden=false;hide=setTimeout(()=>{el.hidden=true},3500);try{window.onNetBack&&window.onNetBack()}catch(e){}}};
+ const ping=async()=>{if(!navigator.onLine)return set(true);if(!/^https?:/.test(location.protocol))return set(false);
+  try{const c=new AbortController(),t=setTimeout(()=>c.abort(),5000);await fetch(location.href.split('#')[0].split('?')[0]+'?_='+Date.now(),{method:'HEAD',cache:'no-store',signal:c.signal});clearTimeout(t);set(false)}catch(e){set(true)}};
+ addEventListener('offline',()=>set(true));addEventListener('online',ping);setInterval(ping,10000);ping()}
+
+/* ---------- ruteo e inicio ---------- */
+function route(){window.onmessage=null;
+ if(PAGE==='pantalla')pantalla();else if(PAGE==='panel')panel();else if(PAGE==='cliente'){const m=parseInt(new URLSearchParams(location.search).get('mesa'));m>0?mesa(m):pickMesa()}else home();netWatch()}
+function attach(st){store=st;['songs','queue','cfg','claps'].forEach(n=>st.sub(n,r=>{if(store!==st)return;S[n]=r;(S._l=S._l||{})[n]=1;try{view.upd()}catch(e){console.error(e)}}))}
+async function init(){
+ addEventListener('hashchange',route);
+ if(FB.apiKey&&FB.apiKey!=='PEGA_AQUI'){try{attach(await fireStore());route();return}catch(e){console.error(e);toast('No se pudo conectar a Firebase')}}
+ attach(localStore());route();toast('Modo local: falta pegar la configuración de Firebase')}
+init();
+</script>
+</body>
+</html>

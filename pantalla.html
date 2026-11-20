@@ -437,9 +437,10 @@ function pantalla(){const A=$('#app');let cur='',seen=new Set(),t0=Date.now();
  let camOn=false;const clock=()=>{const k=$('#ck');if(k)k.textContent=new Date().toLocaleTimeString('es-BO',{hour:'2-digit',minute:'2-digit'})};clock();setInterval(clock,1000);
  $('#cb').onclick=()=>navigator.mediaDevices.getUserMedia({video:{width:640,height:480,facingMode:'user'},audio:false}).then(st=>{$('#cam').srcObject=st;camOn=true;view.upd()}).catch(()=>toast('No se pudo abrir la cámara'));
  function camUi(n){const c=cfg(),cw=$('#cw'),cb=$('#cb');cw.className='camw pos-'+c.camPos;cw.style.display=(c.cam&&camOn&&n)?'block':'none';cb.style.display=(c.cam&&!camOn)?'inline-flex':'none';if(!c.cam&&camOn){const st=$('#cam').srcObject;st&&st.getTracks().forEach(t=>t.stop());$('#cam').srcObject=null;camOn=false}}
+ let endedFor='';const endVid=()=>{if(!cur||endedFor===cur)return;endedFor=cur;if(cfg().auto)next()};
  window.onmessage=e=>{if(!/youtube/.test(e.origin))return;let d;try{d=JSON.parse(e.data)}catch(x){return}
-  if(d&&d.event==='onStateChange')ps=d.info;if(d&&d.event==='infoDelivery'&&d.info){if(typeof d.info.currentTime==='number')lastT=d.info.currentTime;if(typeof d.info.playerState==='number')ps=d.info.playerState}
-  if(d&&d.event==='onStateChange'&&d.info===0&&cfg().auto)next();
+  if(d&&d.event==='onStateChange')ps=d.info;if(d&&d.event==='infoDelivery'&&d.info){if(typeof d.info.currentTime==='number')lastT=d.info.currentTime;if(typeof d.info.playerState==='number'){ps=d.info.playerState;if(ps===0)endVid()}}
+  if(d&&d.event==='onStateChange'&&d.info===0)endVid();
   if(d&&d.event==='onError'){cineOff();const n=nowP();if(n){const s=S.songs.find(x=>x.id===n.songId);if(s&&!s.bad)store.set('songs',s.id,Object.assign({},s,{bad:true}));
    const v=$('#vd');if(v&&!$('#vw'))v.insertAdjacentHTML('afterend','<p id="vw" class="glow" style="margin:10px 0 0">Este video no permite reproducirse en otras páginas. Pulsa «Mirar en YouTube» o elige una versión karaoke.</p>')}}};
  view={upd(){const n=nowP(),c=cfg(),w=waiting();camUi(n);const tk=$('#tk');if(tk){const t=w.length?w.map(x=>(x.modo==='rockola'?'🎵 ':'')+x.singer+' — '+x.title).join('     ♪     '):'Escanea el QR y pide tu canción';tk.textContent=t+'     ♪     '+t}

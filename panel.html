@@ -135,6 +135,8 @@ body.cine-on #xc{display:inline-flex}body.cine-on.mv #xc{opacity:1}
 #off{position:fixed;left:50%;top:calc(8px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:40;padding:8px 16px;border-radius:99px;background:var(--neon);color:#fff;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.4);max-width:92vw;text-align:center}
 #off.back{background:var(--ok);color:#06241a}
 
+.camw{--w:max(110px,var(--cw,14vw));width:var(--w);left:calc(24px + (100vw - var(--w) - 48px) * var(--cx,1));top:calc(64px + (100vh - var(--w) - 120px) * var(--cy,1));right:auto;bottom:auto}
+
 /* ===================== NEON STAGE · capa visual ===================== */
 :root:not([data-theme="light"]){--bg:#050813;--panel:#0c1325;--line:rgba(110,160,255,.2);--tx:#e8f1ff;--mut:#8b9cc0;--brass:#22e5ff;--neon:#b04dff;--mag:#ff2bd6;--ok:#34f5b0;--on:#021019;--fd:Orbitron,Outfit,system-ui,sans-serif}
 :root:not([data-theme="light"]) body[data-p="cliente"]{--brass:#22e5ff;--neon:#b04dff}
@@ -223,12 +225,6 @@ input:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(-
 .lt{background:rgba(5,9,20,.78);border-left:4px solid var(--brass);box-shadow:0 0 24px rgba(34,229,255,.3)}
 .qrs svg,#side svg{box-shadow:0 0 18px rgba(34,229,255,.35)}
 
-/* ---- Cliente: app para pedir canciones ---- */
-body[data-p="cliente"] .wrap{max-width:720px}
-body[data-p="cliente"] .srow>input{font-size:17px;padding:14px 16px;border-radius:14px}
-body[data-p="cliente"] .home .card{border-radius:20px}
-body[data-p="cliente"] .bar h1{font-size:17px}
-
 /* ---- Panel: consola de operador ---- */
 body[data-p="panel"] .wrap{max-width:1040px}
 body[data-p="panel"] .card{border-radius:10px;border-color:rgba(34,229,255,.22);background:linear-gradient(160deg,rgba(14,24,44,.78),rgba(6,10,22,.72));box-shadow:inset 0 1px 0 rgba(34,229,255,.12),0 8px 26px rgba(0,0,0,.5)}
@@ -263,8 +259,14 @@ body::after,.bar h1,.np,.wrap>.card,.home>.card,.modal .card,.flash{animation:no
 <script>
 const DEF={bar:'Rockola Karaoke',premium:true,price:5,max:3,pin:'1234',auto:true,mesas:12,cam:false,camPos:'br',fsAuto:true,ytKey:'',ytClient:true,ytLim:5};
 const S={songs:[],queue:[],cfg:[],claps:[]};
-const VER='1.5';
-const LOG=[['1.5','19 nov 2026',['Aviso «Sin conexión» en el televisor, el panel y los celulares, y «Conexión recuperada» al volver.','Al volver el internet, la pantalla intenta reanudar el video donde iba.','Si un cliente pide una canción sin conexión, la app le avisa que se enviará cuando vuelva el internet.']],
+const VER='1.9';
+const LOG=[['1.9','19 nov 2026',['La pantalla usa siempre el video actual del Catálogo: si cambias o arreglas el enlace de una canción que ya estaba en la cola o sonando, la pantalla lo toma sola.','Pasar a la siguiente canción ya no puede saltarse una canción si se pulsa desde el panel justo cuando el video termina.']],
+['1.8','19 nov 2026',['La barra de noticias ya no repite el mensaje dos veces y su velocidad se ajusta al largo del texto.','Más control de la cámara: lugares rápidos, posición horizontal y vertical, tamaño y forma, con vista previa en Ajustes.']],
+['1.7','19 nov 2026',['Al terminar el video, la pantalla vuelve sola a la vista principal, aunque «pasar al siguiente» esté apagado.','El botón del panel cambia según el momento: «Empezar la primera canción», «Terminar y pasar a la siguiente» o «Sin canciones en espera».','En el celular del cliente, las canciones ya pedidas muestran «✓ En cola · puesto N» o «Sonando ahora» en vez del botón Cantar.']],
+['1.6.1','19 nov 2026',['Corregido: el QR de la pantalla del televisor ahora abre la página de clientes (elegir mesa) en vez de abrir la misma pantalla.']],
+['1.6','19 nov 2026',['La pantalla del televisor es ahora la página principal: se abre con index.html.','Los QR de las mesas siguen funcionando igual (index.html?mesa=N).','Se eliminan cliente.html y pantalla.html: quedan solo index.html y panel.html.']],
+['1.5.1','19 nov 2026',['El cliente se abre solo con index.html: se elimina cliente.html.','La Guía lista los archivos del proyecto.']],
+['1.5','19 nov 2026',['Aviso «Sin conexión» en el televisor, el panel y los celulares, y «Conexión recuperada» al volver.','Al volver el internet, la pantalla intenta reanudar el video donde iba.','Si un cliente pide una canción sin conexión, la app le avisa que se enviará cuando vuelva el internet.']],
 ['1.4','19 nov 2026',['Límite de búsquedas de YouTube por celular y por hora (se cambia en Ajustes) y memoria de búsquedas repetidas, para cuidar la cuota diaria.','Tope de aplausos por celular para no gastar lecturas de Firebase.','Estado visible en la Cola: nube conectada o modo local, aviso si el PIN sigue en 1234 o falta la clave de YouTube.','La pantalla evita que el televisor se apague durante las canciones.']],
 ['1.3','19 nov 2026',['Nuevo botón «Versión rockola»: busca la canción original en YouTube solo para escuchar y ver en la pantalla.','Los pedidos rockola se marcan con 🎵 en la cola, la pantalla y el panel, y se presentan sin «subir al escenario».']],
 ['1.2','19 nov 2026',['Botones separados: «Buscar en el catálogo» y «Buscar en YouTube».','Los resultados de YouTube salen justo debajo del buscador.','Número de versión visible y lista de novedades en la Guía.']],
@@ -306,7 +308,7 @@ function modal(h){const m=document.createElement('div');m.className='modal';m.se
 function seedAll(force){SEED.forEach(x=>{if(force||!S.songs.some(s=>s.id===x.id))store.set('songs',x.id,{title:x.title,artist:x.artist,video:x.video,lang:SM[x.id][0],voz:SM[x.id][1]})});if(force)toast('20 temas cargados')}
 function grad(a){let h=0;for(const c of String(a))h=(h*31+c.charCodeAt(0))%360;return 'linear-gradient(135deg,hsl('+h+',70%,55%),hsl('+((h+50)%360)+',70%,38%))'}
 async function verify(){toast('Verificando videos…');let ok=0,bad=0,unk=0;for(const s of S.songs){if(!s.video)continue;try{const r=await fetch('https://www.youtube.com/oembed?format=json&url='+encodeURIComponent('https://www.youtube.com/watch?v='+s.video));if(r.ok){ok++;if(s.bad)store.set('songs',s.id,Object.assign({},s,{bad:false}))}else{bad++;store.set('songs',s.id,Object.assign({},s,{bad:true}))}}catch(e){unk++}}toast(ok||bad?ok+' correctos, '+bad+' con problema':'Este navegador no permite verificar; usa «Probar» en cada tema')}
-const PAGE=document.documentElement.dataset.page||'home';
+const PAGE=(p=>p==='auto'?((parseInt(new URLSearchParams(location.search).get('mesa'))>0||new URLSearchParams(location.search).has('cliente'))?'cliente':'pantalla'):p)(document.documentElement.dataset.page||'home');
 const stats=()=>{const d=S.queue.filter(x=>x.status==='done').length,p=S.queue.filter(x=>x.prio&&x.paid).length*(+cfg().price||0);return '<div class="stats"><div class="card"><b>'+waiting().length+'</b><span class="mut small">En espera</span></div><div class="card"><b>'+d+'</b><span class="mut small">Cantadas</span></div><div class="card"><b>Bs '+p+'</b><span class="mut small">Premium</span></div></div>'};
 function pickMesa(){$('#app').innerHTML=head(cfg().bar)+'<div class="wrap" style="text-align:center">'+vinyl(110)+'<h2 style="margin:14px 0">¿En qué mesa estás?</h2><div class="card stack"><input id="mn" type="number" min="1" placeholder="Número de mesa" aria-label="Número de mesa"><button class="btn" id="go">Entrar</button></div></div>';$('#go').onclick=()=>{const n=parseInt($('#mn').value);if(n>0)location.search='?mesa='+n;else toast('Escribe el número de mesa')};view={upd(){}}}
 function burst(k){const d=document.createElement('div');d.className='fl';d.style.left=(8+Math.random()*84)+'%';d.innerHTML=(k.e||'👏')+'<small>Mesa '+esc(k.mesa)+'</small>';document.body.appendChild(d);setTimeout(()=>d.remove(),3100);cc++;const el=$('#cc');if(el)el.textContent=cc+' aplausos'}
@@ -350,7 +352,7 @@ function request(song,mesa,singer,prio,modo){
  if(mine>=c.max)return toast('Esta mesa ya tiene '+c.max+' pedidos en espera');
  store.set('queue',uid('q'),{songId:song.id,title:song.title,artist:song.artist,video:song.video||'',singer:singer||('Mesa '+mesa),mesa:+mesa,prio:!!prio,paid:false,modo:modo?'rockola':'',status:'wait',ts:Date.now()});
  toast(window._off?'Sin conexión: tu pedido se enviará cuando vuelva el internet.':modo?'Pedido enviado. ¡Atento a la pantalla!':prio?'Pedido enviado. Paga en caja para activar la prioridad':'Pedido enviado. ¡Prepárate para cantar!')}
-function next(){const n=nowP();if(n)upd(n,{status:'done',doneAt:Date.now()});const w=waiting()[0];if(w)upd(w,{status:'now',startAt:Date.now()})}
+function next(exp){const n=nowP();if(exp!==undefined&&(n?n.id:'')!==exp)return;if(n)upd(n,{status:'done',doneAt:Date.now()});const w=waiting()[0];if(w)upd(w,{status:'now',startAt:Date.now()})}
 function qrSvg(t){try{const q=qrcode(0,'M');q.addData(t);q.make();return q.createSvgTag(4,2)}catch(e){return '<p class="small mut">'+esc(t)+'</p>'}}
 const base=()=>location.href.split('#')[0];
 const root=()=>location.href.split(/[?#]/)[0].replace(/[^/]*$/,'');
@@ -359,11 +361,11 @@ const head=(t,extra)=>'<div class="bar"><div class="brand">'+vinyl(36)+'<h1>'+es
 /* ---------- inicio ---------- */
 function home(){const A=$('#app');
  A.innerHTML=head(cfg().bar)+'<div class="wrap" style="text-align:center">'+vinyl(120)+'<p class="mut">Elige cómo quieres abrir la rockola en este dispositivo.</p><div class="home">'+
- '<a class="card" href="pantalla.html"><h3>Pantalla principal</h3><p class="mut small">Para el televisor o proyector: video, turno actual y próximos cantantes.</p></a>'+
+ '<a class="card" href="./"><h3>Pantalla principal</h3><p class="mut small">Para el televisor o proyector: video, turno actual y próximos cantantes.</p></a>'+
  '<a class="card" href="panel.html"><h3>Panel de control</h3><p class="mut small">Cola, catálogo, QR de mesas, prioridad premium y ajustes.</p></a>'+
  '<div class="card"><h3>Pedir desde una mesa</h3><div class="row" style="margin-top:10px"><input id="mn" type="number" min="1" placeholder="Número de mesa" aria-label="Número de mesa"><button class="btn" id="go">Entrar</button></div></div></div>'+
  '<p class="small mut" id="mode"></p></div>';
- $('#go').onclick=()=>{const n=parseInt($('#mn').value);if(n>0)location.href='cliente.html?mesa='+n;else toast('Escribe el número de mesa')};
+ $('#go').onclick=()=>{const n=parseInt($('#mn').value);if(n>0)location.href='index.html?mesa='+n;else toast('Escribe el número de mesa')};
  view={upd(){const m=$('#mode');if(m)m.textContent=store&&store.mode==='cloud'?'Conectado a la nube: todos los dispositivos comparten la cola.':'Modo local: los datos solo se comparten entre pestañas de este navegador.'}};view.upd()}
 
 /* ---------- mesa (cliente) ---------- */
@@ -393,16 +395,17 @@ function mesa(n){const A=$('#app');let q='',art='',lang='',voz='',yt=null,ytq=''
   if(yt==null)h+='<p class="mut small">¿No está tu canción? Escribe el artista o el título arriba y pulsa el botón «Buscar en YouTube».</p>';
   else if(yt==='load')h+='<p class="mut">Buscando «'+esc(ytq)+'»…</p>';
   else if(typeof yt==='string')h+='<p class="glow">'+esc(yt.slice(4))+'</p>';
-  else h+=yt.length?yt.map((r,i)=>'<div class="song">'+(r.th?'<img class="th" loading="lazy" alt="" src="'+esc(r.th)+'">':'')+'<div class="grow"><b>'+esc(cleanT(r.title))+'</b><div class="mut small">'+esc(r.ch)+'</div></div><button class="btn sm" data-y="'+i+'">'+(ytm==='rock'?ic('note',16)+' Poner':ic('mic',16)+' Cantar')+'</button>'+(cfg().premium?'<button class="btn neon sm" data-y="'+i+'" data-p="1">'+ic('crown',16)+' Prioridad Bs '+esc(cfg().price)+'</button>':'')+'</div>').join(''):'<p class="mut">Sin resultados para «'+esc(ytq)+'».</p>';
+  else h+=yt.length?yt.map((r,i)=>'<div class="song">'+(r.th?'<img class="th" loading="lazy" alt="" src="'+esc(r.th)+'">':'')+'<div class="grow"><b>'+esc(cleanT(r.title))+'</b><div class="mut small">'+esc(r.ch)+'</div></div>'+(qs('yt_'+r.id)?'<span class="tag ok">✓ '+qs('yt_'+r.id)+'</span>':'<button class="btn sm" data-y="'+i+'">'+(ytm==='rock'?ic('note',16)+' Poner':ic('mic',16)+' Cantar')+'</button>'+(cfg().premium?'<button class="btn neon sm" data-y="'+i+'" data-p="1">'+ic('crown',16)+' Prioridad Bs '+esc(cfg().price)+'</button>':''))+'</div>').join(''):'<p class="mut">Sin resultados para «'+esc(ytq)+'».</p>';
   b.innerHTML=h}
  function doCat(){draw();$('#st').scrollIntoView({behavior:'smooth',block:'start'})}
  async function doYt(m){ytm=m||'';const t=$('#sq').value.trim();if(!t)return toast('Escribe un artista o una canción');ytq=t;yt='load';ytDraw();$('#yt').scrollIntoView({behavior:'smooth',block:'start'});const my=++tok;
   try{const r=await ytSearch(t+(voz==='duo'?' dueto':voz==='trio'?' trío':''),{lang:lang&&lang!=='xx'?lang:'',raw:ytm==='rock'});if(my===tok)yt=r}catch(e){if(my===tok)yt='err:'+ytErr(e)}
   if(my===tok)ytDraw()}
+ function qs(id){const x=S.queue.find(q=>q.mesa==n&&q.songId===id&&q.status!=='done');if(!x)return '';if(x.status==='now')return x.modo==='rockola'?'Sonando ahora':'¡Es tu turno!';if(x.prio&&!x.paid)return 'Esperando pago';return 'En cola · puesto '+(waiting().findIndex(y=>y.id===x.id)+1)}
  function draw(){const c=cfg(),l=songs().filter(s=>(!art||s.artist===art)&&(!lang||lg(s)===lang)&&(!voz||vz(s)===voz)&&(!q||nz(s.title+' '+s.artist).includes(q)));
   $('#st').textContent='★ Catálogo · '+l.length+(l.length===1?' canción':' canciones');
   $('#sl').innerHTML=l.length?l.map((s,i)=>'<div class="song"><span class="rk">'+(i+1)+'</span><span class="av" style="background:'+grad(s.artist)+'">'+esc(String(s.artist||'?')[0])+'</span><div class="grow"><b>'+esc(s.title)+'</b><div class="mut small">'+esc(s.artist)+(lg(s)?' · '+esc(lab(LANGS,lg(s))):'')+(vz(s)?' · '+esc(lab(VOCES,vz(s))):'')+'</div></div>'+
-   '<button class="btn sm" data-id="'+esc(s.id)+'">'+ic('mic',16)+' Cantar</button>'+(c.premium?'<button class="btn neon sm" data-id="'+esc(s.id)+'" data-p="1" title="Pasa al frente de la cola">'+ic('crown',16)+' Prioridad Bs '+esc(c.price)+'</button>':'')+'</div>').join(''):'<p class="mut">'+(S.songs.length?'No hay resultados en el catálogo.'+(ytOn()?' Prueba «Buscar en YouTube».':' Pídele al encargado que la agregue.'):'El catálogo está vacío. Pídele al encargado que cargue canciones.')+'</p>';
+   (qs(s.id)?'<span class="tag ok">✓ '+qs(s.id)+'</span>':'<button class="btn sm" data-id="'+esc(s.id)+'">'+ic('mic',16)+' Cantar</button>'+(c.premium?'<button class="btn neon sm" data-id="'+esc(s.id)+'" data-p="1" title="Pasa al frente de la cola">'+ic('crown',16)+' Prioridad Bs '+esc(c.price)+'</button>':''))+'</div>').join(''):'<p class="mut">'+(S.songs.length?'No hay resultados en el catálogo.'+(ytOn()?' Prueba «Buscar en YouTube».':' Pídele al encargado que la agregue.'):'El catálogo está vacío. Pídele al encargado que cargue canciones.')+'</p>';
   const w=waiting(),mine=S.queue.filter(x=>x.mesa==n&&x.status!=='done');
   $('#my').innerHTML=(mine.some(x=>x.status==='now'&&x.modo!=='rockola')?'<div class="turn">'+ic('mic',22)+' ¡Es tu turno, sube al escenario!</div>':(mine.some(x=>x.status==='now')?'<div class="turn">'+ic('note',22)+' ¡Tu canción está sonando! Mira la pantalla</div>':''))+'<h3 style="font-size:16px;margin-bottom:8px">Tus pedidos</h3>'+(mine.length?mine.map(x=>{let st='';if(x.status==='now')st='<span class="tag w">'+(x.modo==='rockola'?'Sonando ahora':'¡Es tu turno!')+'</span>';else if(x.prio&&!x.paid)st='<span class="tag">Esperando pago</span>';else st='<span class="tag p">Posición '+(w.findIndex(y=>y.id===x.id)+1)+' · ~'+(4*(w.findIndex(y=>y.id===x.id)+1))+' min</span>';
    return '<div class="song"><div class="grow"><b>'+(x.modo==='rockola'?'🎵 ':'')+esc(x.title)+'</b><div class="mut small">'+esc(x.artist)+'</div></div>'+st+(x.status==='wait'?'<button class="btn ghost sm" data-del="'+x.id+'">Cancelar</button>':'')+'</div>'}).join(''):'<p class="mut small">Aún no has pedido canciones.</p>')}
@@ -413,8 +416,9 @@ function mesa(n){const A=$('#app');let q='',art='',lang='',voz='',yt=null,ytq=''
 function pantalla(){const A=$('#app');let cur='',seen=new Set(),t0=Date.now();
  A.innerHTML='<div class="tv"><main id="main"></main><aside id="side" class="stack"></aside></div><div class="ck" id="ck"></div><div class="tick"><span id="tk"></span></div><div class="camw" id="cw"><video id="cam" autoplay muted playsinline></video><b>● EN VIVO</b></div><button class="btn ghost sm" id="cb" style="position:fixed;left:12px;bottom:92px;display:none">Activar cámara</button>'+
  '<button class="btn ghost sm" id="fs" style="position:fixed;left:12px;bottom:48px">Pantalla completa</button><button class="btn ghost sm" id="xc">✕ Salir de pantalla completa</button>';
- let cine=false,mvT,lastT=0,ps=-2;
- window.onNetBack=()=>{setTimeout(()=>{const f=$('#vd iframe');if(!f||!f.dataset.src||!f.src||ps===1)return;const t=Math.max(0,Math.floor(lastT)-2);f.src=f.dataset.src+(t>0?'&start='+t:'')},4000)};
+ let cine=false,mvT,lastT=0,ps=-2,endFor='',curVid='';
+ function ended(){const n=nowP();if(!n||endFor===n.id)return;endFor=n.id;cineOff();if(cfg().auto)next(n.id)}
+ window.onNetBack=()=>{setTimeout(()=>{const f=$('#vd iframe');if(!f||!f.dataset.src||!f.src||ps===1||ps===0)return;const t=Math.max(0,Math.floor(lastT)-2);f.src=f.dataset.src+(t>0?'&start='+t:'')},4000)};
  const wl=()=>{try{navigator.wakeLock&&navigator.wakeLock.request('screen').catch(()=>{})}catch(e){}};wl();document.addEventListener('visibilitychange',()=>{if(!document.hidden)wl()});
  const wake=()=>{document.body.classList.add('mv');clearTimeout(mvT);mvT=setTimeout(()=>document.body.classList.remove('mv'),3000)};
  addEventListener('mousemove',wake);addEventListener('touchstart',wake);
@@ -427,41 +431,42 @@ function pantalla(){const A=$('#app');let cur='',seen=new Set(),t0=Date.now();
  document.onfullscreenchange=()=>{const f=$('#fs');if(f)f.style.display=document.fullscreenElement?'none':''};
  let camOn=false;const clock=()=>{const k=$('#ck');if(k)k.textContent=new Date().toLocaleTimeString('es-BO',{hour:'2-digit',minute:'2-digit'})};clock();setInterval(clock,1000);
  $('#cb').onclick=()=>navigator.mediaDevices.getUserMedia({video:{width:640,height:480,facingMode:'user'},audio:false}).then(st=>{$('#cam').srcObject=st;camOn=true;view.upd()}).catch(()=>toast('No se pudo abrir la cámara'));
- function camUi(n){const c=cfg(),cw=$('#cw'),cb=$('#cb');cw.className='camw pos-'+c.camPos;cw.style.display=(c.cam&&camOn&&n)?'block':'none';cb.style.display=(c.cam&&!camOn)?'inline-flex':'none';if(!c.cam&&camOn){const st=$('#cam').srcObject;st&&st.getTracks().forEach(t=>t.stop());$('#cam').srcObject=null;camOn=false}}
+ function camUi(n){const c=cfg(),cw=$('#cw'),cb=$('#cb');const xy=camXY(c);cw.className='camw';cw.style.setProperty('--cw',(c.camSize||14)+'vw');cw.style.setProperty('--cx',xy[0]/100);cw.style.setProperty('--cy',xy[1]/100);cw.style.borderRadius=c.camShape==='round'?'18px':'50%';cw.style.display=(c.cam&&camOn&&n)?'block':'none';cb.style.display=(c.cam&&!camOn)?'inline-flex':'none';if(!c.cam&&camOn){const st=$('#cam').srcObject;st&&st.getTracks().forEach(t=>t.stop());$('#cam').srcObject=null;camOn=false}}
  window.onmessage=e=>{if(!/youtube/.test(e.origin))return;let d;try{d=JSON.parse(e.data)}catch(x){return}
   if(d&&d.event==='onStateChange')ps=d.info;if(d&&d.event==='infoDelivery'&&d.info){if(typeof d.info.currentTime==='number')lastT=d.info.currentTime;if(typeof d.info.playerState==='number')ps=d.info.playerState}
-  if(d&&d.event==='onStateChange'&&d.info===0&&cfg().auto)next();
+  if((d&&d.event==='onStateChange'&&d.info===0)||(d&&d.event==='infoDelivery'&&d.info&&d.info.playerState===0&&lastT>1))ended();
   if(d&&d.event==='onError'){cineOff();const n=nowP();if(n){const s=S.songs.find(x=>x.id===n.songId);if(s&&!s.bad)store.set('songs',s.id,Object.assign({},s,{bad:true}));
    const v=$('#vd');if(v&&!$('#vw'))v.insertAdjacentHTML('afterend','<p id="vw" class="glow" style="margin:10px 0 0">Este video no permite reproducirse en otras páginas. Pulsa «Mirar en YouTube» o elige una versión karaoke.</p>')}}};
- view={upd(){const n=nowP(),c=cfg(),w=waiting();camUi(n);const tk=$('#tk');if(tk){const t=w.length?w.map(x=>(x.modo==='rockola'?'🎵 ':'')+x.singer+' — '+x.title).join('     ♪     '):'Escanea el QR y pide tu canción';tk.textContent=t+'     ♪     '+t}
+ view={upd(){const n=nowP(),c=cfg(),w=waiting();camUi(n);const tk=$('#tk');if(tk){const t=w.length?w.map(x=>(x.modo==='rockola'?'🎵 ':'')+x.singer+' — '+x.title).join('     ♪     '):'Escanea el QR y pide tu canción';if(tk._t!==t){tk._t=t;tk.textContent=t;tk.style.animationDuration=Math.max(15,Math.round(tk.offsetWidth/110))+'s'}}
   S.claps.filter(k=>!seen.has(k.id)&&k.ts>=t0-5000).forEach(k=>{seen.add(k.id);burst(k);store.del('claps',k.id)});
-  if(n){const id=ytId(n.video);
-   if(cur!==n.id){cur=n.id;cineOff();lastT=0;ps=-2;$('#main').innerHTML='<div class="vid" id="vd">'+(id?'<iframe title="Video" allow="autoplay; encrypted-media; fullscreen" data-src="https://www.youtube-nocookie.com/embed/'+id+'?autoplay=1&enablejsapi=1&rel=0&origin='+encodeURIComponent(location.origin)+'"></iframe>':'<div class="idle" style="height:100%;border:0"><div><h2 class="glow">Sin video</h2><p class="mut">Esta canción no tiene enlace de YouTube. Usa «Siguiente» en el panel.</p></div></div>')+'</div><div class="now" id="nw"></div><div class="mut" id="ns"></div><p><span class="eq"><i></i><i></i><i></i><i></i></span> <b id="cc">0 aplausos</b></p><p class="small"><a id="yl" target="_blank" rel="noopener" style="color:var(--brass)"></a></p>';
+  if(n){const sg=S.songs.find(x=>x.id===n.songId),id=ytId((sg&&sg.video)||n.video);
+   if(cur===n.id&&id!==curVid)cur='';
+   if(cur!==n.id){cur=n.id;curVid=id;cineOff();lastT=0;ps=-2;$('#main').innerHTML='<div class="vid" id="vd">'+(id?'<iframe title="Video" allow="autoplay; encrypted-media; fullscreen" data-src="https://www.youtube-nocookie.com/embed/'+id+'?autoplay=1&enablejsapi=1&rel=0&origin='+encodeURIComponent(location.origin)+'"></iframe>':'<div class="idle" style="height:100%;border:0"><div><h2 class="glow">Sin video</h2><p class="mut">Esta canción no tiene enlace de YouTube. Pulsa «Terminar y pasar a la siguiente» en el panel.</p></div></div>')+'</div><div class="now" id="nw"></div><div class="mut" id="ns"></div><p><span class="eq"><i></i><i></i><i></i><i></i></span> <b id="cc">0 aplausos</b></p><p class="small"><a id="yl" target="_blank" rel="noopener" style="color:var(--brass)"></a></p>';
     const f=$('#vd iframe');if(f)f.onload=()=>{try{f.contentWindow.postMessage(JSON.stringify({event:'listening',id:1,channel:'widget'}),'*')}catch(x){}};cc=0;announce(n);if(f){const my=n.id;setTimeout(()=>{if(cur===my){f.src=f.dataset.src;cineOn(n)}},3800)}}
    $('#nw').textContent=n.title;$('#ns').textContent=n.modo==='rockola'?n.artist+' · pedida por la mesa '+n.mesa:n.artist+' · canta '+n.singer+' (mesa '+n.mesa+')';const yl=$('#yl');yl.href=id?'https://www.youtube.com/watch?v='+id:'https://www.youtube.com/results?search_query='+encodeURIComponent(n.title+' '+n.artist+' karaoke');yl.textContent=id?'¿No carga el video? Ábrelo en YouTube':'Buscar karaoke de esta canción en YouTube'}
   else{cur='';cineOff();const top={};S.queue.filter(q=>q.status==='done').forEach(q=>top[q.singer]=(top[q.singer]||0)+1);const t=Object.entries(top).sort((a,b)=>b[1]-a[1]).slice(0,5);
    $('#main').innerHTML='<h1>'+esc(c.bar)+'</h1><div class="idle" style="margin-top:16px"><div>'+vinyl(140)+'<h2 class="glow" style="font-size:clamp(26px,4vw,52px)">Escanea el QR de tu mesa</h2><p class="mut">Elige tu canción desde el celular y sube al escenario.</p>'+(t.length?'<p style="margin-top:18px"><b>Más cantores de la noche</b><br>'+t.map(x=>esc(x[0])+' ('+x[1]+')').join(' · ')+'</p>':'')+'</div></div>'}
-  $('#side').innerHTML='<div class="card"><h3 style="font-size:18px;color:var(--brass)">Próximos</h3>'+(w.length?w.slice(0,6).map((x,i)=>'<div class="song"><span class="tag '+(x.prio?'p':'')+'">'+(i+1)+'</span><div class="grow"><b>'+(x.modo==='rockola'?'🎵 ':'')+esc(x.singer)+'</b><div class="mut small">'+esc(x.title)+' · '+esc(x.artist)+'</div></div></div>').join(''):'<p class="mut">La cola está libre. ¡Anímate a pedir!</p>')+'</div><div class="card" style="text-align:center">'+qrSvg(root())+'<p class="small mut" style="margin:6px 0 0">Escanea y pide tu canción</p></div>'}};view.upd()}
+  $('#side').innerHTML='<div class="card"><h3 style="font-size:18px;color:var(--brass)">Próximos</h3>'+(w.length?w.slice(0,6).map((x,i)=>'<div class="song"><span class="tag '+(x.prio?'p':'')+'">'+(i+1)+'</span><div class="grow"><b>'+(x.modo==='rockola'?'🎵 ':'')+esc(x.singer)+'</b><div class="mut small">'+esc(x.title)+' · '+esc(x.artist)+'</div></div></div>').join(''):'<p class="mut">La cola está libre. ¡Anímate a pedir!</p>')+'</div><div class="card" style="text-align:center">'+qrSvg(root()+'?cliente')+'<p class="small mut" style="margin:6px 0 0">Escanea y pide tu canción</p></div>'}};view.upd()}
 
 /* ---------- panel de control ---------- */
 function guiaOperador(){const li=t=>'<li><span>'+t+'</span></li>';
  return '<div class="card"><h3 style="font-size:18px">Guía rápida del operador</h3>'+
  '<h3 class="sec">Antes de abrir el local</h3><ol class="steps">'+
  li('Entra a <b>Cola</b> y confirma que arriba diga «☁ Conectado a la nube». Si dice «Modo local», los celulares no ven la cola. Cambia también el PIN en Ajustes.')+
- li('Abre <b>pantalla.html</b> en el televisor o proyector y pulsa <b>Pantalla completa</b> una sola vez. Desde ahí, cada video se pone a pantalla completa solo, justo después de presentar al cantante. Si el navegador no lo permite, usa F11.')+
+ li('Abre la dirección principal (<b>index.html</b>) en el televisor o proyector y pulsa <b>Pantalla completa</b> una sola vez. Desde ahí, cada video se pone a pantalla completa solo, justo después de presentar al cantante. Si el navegador no lo permite, usa F11.')+
  li('En <b>Catálogo</b> toca <b>Cargar los 20 temas</b> o agrega los tuyos. Elige idioma y voz (hombre, mujer, dúo, trío): con eso los clientes filtran.')+
  li('Pega el enlace de YouTube de cada tema y toca <b>Guardar video</b>. Sabrás que se guardó porque aparece «✓ ¡Guardado!» y la canción queda con la etiqueta verde «✓ Video guardado». Sin esa etiqueta, la canción no tiene video.')+
  li('En <b>Buscar karaoke</b> busca por artista o título, prueba el video y toca <b>Agregar al catálogo</b>.')+
  li('En <b>Mesas y QR</b> imprime los QR y pégalos en cada mesa.')+'</ol>'+
  '<h3 class="sec">Durante la noche</h3><ol class="steps">'+
  li('En <b>Cola</b>, los pedidos con prioridad esperan en «Prioridad por confirmar pago». Cobra y toca <b>Confirmar pago</b>.')+
- li('El siguiente cantante entra solo cuando termina el video. Si hace falta, toca <b>Siguiente</b>.')+
+ li('El siguiente cantante entra solo cuando termina el video. Si hace falta, toca <b>Terminar y pasar a la siguiente</b>.')+
  li('Si un video no carga (bloqueado fuera de YouTube), ve a Catálogo, toca <b>Buscar video</b>, elige otro y guárdalo.')+
  li('Para salir de la pantalla completa en el televisor, toca o mueve el mouse y pulsa «Salir de pantalla completa».')+'</ol>'+
  '<h3 class="sec">Si se corta el internet</h3><ol class="steps">'+
  li('Aparece un aviso rojo «Sin conexión» arriba, en el televisor, el panel y los celulares.')+
  li('La música se detiene. Los pedidos hechos en ese momento se envían solos cuando vuelve el internet.')+
- li('Al volver aparece «✓ Conexión recuperada» y la pantalla intenta reanudar el video donde iba. Si no lo logra, toca <b>Siguiente</b> en la Cola.')+
+ li('Al volver aparece «✓ Conexión recuperada» y la pantalla intenta reanudar el video donde iba. Si no lo logra, toca <b>Terminar y pasar a la siguiente</b> en la Cola.')+
  li('Si recargas una página sin internet, entra en «Modo local». Cuando vuelva la conexión, recárgala.')+'</ol>'+
  '<h3 class="sec">Crear la clave de búsqueda de YouTube (gratis)</h3><ol class="steps">'+
  li('Entra a <b>console.cloud.google.com</b> y crea un proyecto.')+
@@ -469,19 +474,26 @@ function guiaOperador(){const li=t=>'<li><span>'+t+'</span></li>';
  li('En «Credenciales» crea una <b>clave de API</b>.')+
  li('Restríngela a tu sitio web (tu dominio) y solo a YouTube Data API v3.')+
  li('Pégala en <b>Ajustes</b> y guarda. Los clientes también podrán buscar desde su celular.')+'</ol>'+
- '<p class="small mut">Cada búsqueda gasta 100 unidades de la cuota diaria gratuita (por defecto 10 000, unas 100 búsquedas al día entre todos). Si se agota, el catálogo sigue funcionando. Para cuidarla, cada celular tiene un límite de búsquedas por hora (se cambia en Ajustes) y las búsquedas repetidas no gastan cuota.</p></div><div class="card" style="margin-top:12px"><h3 style="font-size:18px">Versión '+VER+'</h3>'+LOG.map(v=>'<h3 class="sec">v'+v[0]+' · '+v[1]+'</h3><ul class="small" style="margin:0;padding-left:18px">'+v[2].map(x=>'<li>'+x+'</li>').join('')+'</ul>').join('')+'</div>'}
+ '<p class="small mut">Cada búsqueda gasta 100 unidades de la cuota diaria gratuita (por defecto 10 000, unas 100 búsquedas al día entre todos). Si se agota, el catálogo sigue funcionando. Para cuidarla, cada celular tiene un límite de búsquedas por hora (se cambia en Ajustes) y las búsquedas repetidas no gastan cuota.</p><p class="small mut">Archivos del proyecto: <b>index.html</b> (la pantalla del televisor; con ?mesa=N abre la página de clientes, que es la de los QR) y <b>panel.html</b> (operador). Ya no se usan cliente.html ni pantalla.html.</p></div><div class="card" style="margin-top:12px"><h3 style="font-size:18px">Versión '+VER+'</h3>'+LOG.map(v=>'<h3 class="sec">v'+v[0]+' · '+v[1]+'</h3><ul class="small" style="margin:0;padding-left:18px">'+v[2].map(x=>'<li>'+x+'</li>').join('')+'</ul>').join('')+'</div>'}
 
+function camXY(c){const r=S.cfg.find(x=>x.id==='main')||{},d=({br:[100,100],bl:[0,100],tr:[100,0],tl:[0,0]})[c.camPos]||[100,100];return [r.camX!=null?r.camX:d[0],r.camY!=null?r.camY:d[1]]}
+function camBlock(c){const xy=camXY(c);return '<div class="card stack" style="background:transparent"><b>Cámara en la pantalla</b><label>Lugares rápidos<select id="cp"><option value="">Elegir…</option>'+[['0,0','Arriba izquierda'],['50,0','Arriba centro'],['100,0','Arriba derecha'],['0,50','Medio izquierda'],['100,50','Medio derecha'],['0,100','Abajo izquierda'],['50,100','Abajo centro'],['100,100','Abajo derecha']].map(o=>'<option value="'+o[0]+'">'+o[1]+'</option>').join('')+'</select></label>'+
+ '<label>Horizontal: <span id="cxv"></span><input id="cx" type="range" min="0" max="100" value="'+xy[0]+'"></label><label>Vertical: <span id="cyv"></span><input id="cy" type="range" min="0" max="100" value="'+xy[1]+'"></label><label>Tamaño: <span id="csv"></span><input id="cs" type="range" min="8" max="35" value="'+(c.camSize||14)+'"></label>'+
+ '<label>Forma<select id="csh"><option value="circle"'+(c.camShape!=='round'?' selected':'')+'>Círculo</option><option value="round"'+(c.camShape==='round'?' selected':'')+'>Cuadrado redondeado</option></select></label>'+
+ '<div id="cpv" role="img" aria-label="Vista previa de la pantalla" style="position:relative;aspect-ratio:16/9;background:#0e0a12;border:1px solid var(--brass);border-radius:8px;overflow:hidden"><div id="cpd" style="position:absolute;aspect-ratio:1;background:var(--neon);opacity:.85"></div></div><p class="small mut" style="margin:0">La vista previa representa el televisor. Guarda los ajustes para aplicarlo.</p></div>'}
+function camWire(){const f=()=>{const x=+$('#cx').value,y=+$('#cy').value,z=+$('#cs').value,sh=z*16/9,d=$('#cpd');$('#cxv').textContent=x+'%';$('#cyv').textContent=y+'%';$('#csv').textContent=z+'%';d.style.width=z+'%';d.style.left=(1.25+(100-z-2.5)*x/100)+'%';d.style.top=(6+(100-sh-17)*y/100)+'%';d.style.borderRadius=$('#csh').value==='round'?'18%':'50%'};
+ ['cx','cy','cs'].forEach(i=>{$('#'+i).oninput=f});$('#csh').onchange=f;$('#cp').onchange=e=>{if(!e.target.value)return;const v=e.target.value.split(',');$('#cx').value=v[0];$('#cy').value=v[1];f();e.target.value=''};f()}
 function estado(){const c=cfg();let h=store&&store.mode==='cloud'?'<span class="tag ok">☁ Conectado a la nube</span>':'<span class="tag w">⚠ Modo local: los celulares NO ven esta cola</span>';if(c.pin==='1234')h+='<span class="tag w">Cambia el PIN en Ajustes</span>';if(!c.ytKey)h+='<span class="tag">Sin clave de YouTube</span>';return '<div class="row" style="gap:6px">'+h+'</div>'}
 function panel(){const A=$('#app');
  if(!isAdmin&&sessionStorageOK('rk_ok')!=='1'){A.innerHTML=head('Panel')+'<div class="wrap"><div class="card stack"><h3>Ingresa el PIN</h3><input id="pin" type="password" inputmode="numeric" aria-label="PIN"><button class="btn" id="ok">Entrar</button><p class="small mut">PIN inicial: 1234. Cámbialo en Ajustes.</p></div></div>';
   $('#ok').onclick=()=>{if($('#pin').value===cfg().pin){sessionStorageOK('rk_ok','1');panel()}else toast('PIN incorrecto')};view={upd(){}};return}
  const T={cola:'Cola',cat:'Catálogo',yt:'Buscar karaoke',qr:'Mesas y QR',aj:'Ajustes',gd:'Guía'};let tab='cola',cur,sig='',yres=null;
- A.innerHTML=head(cfg().bar+' · panel','<span class="tag">v'+VER+'</span> <a class="btn ghost sm" href="pantalla.html" target="_blank">Abrir pantalla</a>')+'<div class="wrap"><div class="tabs" id="tb">'+Object.entries(T).map(([k,v])=>'<button class="chip" data-t="'+k+'">'+v+'</button>').join('')+'</div><div id="pb"></div></div>';
+ A.innerHTML=head(cfg().bar+' · panel','<span class="tag">v'+VER+'</span> <a class="btn ghost sm" href="index.html" target="_blank">Abrir pantalla</a>')+'<div class="wrap"><div class="tabs" id="tb">'+Object.entries(T).map(([k,v])=>'<button class="chip" data-t="'+k+'">'+v+'</button>').join('')+'</div><div id="pb"></div></div>';
  $('#tb').onclick=e=>{const b=e.target.closest('[data-t]');if(b){tab=b.dataset.t;show()}};
  const tabs={
  cola:{mount(){$('#pb').innerHTML='<div id="pc" class="stack"></div>';$('#pc').onclick=e=>{const b=e.target.closest('[data-a]');if(!b)return;const q=S.queue.find(x=>x.id===b.dataset.id),a=b.dataset.a;
-   if(a==='next')next();else if(a==='pay')upd(q,{paid:true});else if(a==='rm')store.del('queue',q.id);else if(a==='clean')S.queue.filter(x=>x.status==='done').forEach(x=>store.del('queue',x.id))}},
-  upd(){const n=nowP(),w=waiting(),h=held();$('#pc').innerHTML=estado()+stats()+'<div class="card"><div class="row"><div class="grow"><span class="mut small">Sonando ahora</span><h3 style="font-size:18px">'+(n?esc(n.title):'Nadie en el escenario')+'</h3>'+(n?'<div class="mut small">'+esc(n.artist)+' · '+esc(n.singer)+' (mesa '+n.mesa+')</div>':'')+'</div><button class="btn neon" data-a="next">Siguiente</button></div></div>'+
+   if(a==='next')next(b.dataset.now||'');else if(a==='pay')upd(q,{paid:true});else if(a==='rm')store.del('queue',q.id);else if(a==='clean')S.queue.filter(x=>x.status==='done').forEach(x=>store.del('queue',x.id))}},
+  upd(){const n=nowP(),w=waiting(),h=held();$('#pc').innerHTML=estado()+stats()+'<div class="card"><div class="row"><div class="grow"><span class="mut small">Sonando ahora</span><h3 style="font-size:18px">'+(n?esc(n.title):'Nadie en el escenario')+'</h3>'+(n?'<div class="mut small">'+esc(n.artist)+' · '+esc(n.singer)+' (mesa '+n.mesa+')</div>':'')+'</div><button class="btn neon" data-a="next" data-now="'+(n?n.id:'')+'"'+(!n&&!w.length?' disabled':'')+'>'+(n?(w.length?'⏭ Terminar y pasar a la siguiente':'⏹ Terminar (no hay más en espera)'):(w.length?'▶ Empezar la primera canción':'Sin canciones en espera'))+'</button></div></div>'+
    (h.length?'<div class="card"><h3 style="font-size:16px">Prioridad por confirmar pago</h3>'+h.map(x=>'<div class="song"><div class="grow"><b>'+esc(x.title)+'</b><div class="mut small">Mesa '+x.mesa+' · '+esc(x.singer)+' · Bs '+esc(cfg().price)+'</div></div><button class="btn sm" data-a="pay" data-id="'+x.id+'">Confirmar pago</button><button class="btn ghost sm" data-a="rm" data-id="'+x.id+'">Quitar</button></div>').join('')+'</div>':'')+
    '<div class="card"><h3 style="font-size:16px">En espera ('+w.length+')</h3>'+(w.length?w.map((x,i)=>'<div class="song"><span class="tag '+(x.prio?'p':'')+'">'+(i+1)+'</span><div class="grow"><b>'+(x.modo==='rockola'?'🎵 ':'')+esc(x.title)+'</b><div class="mut small">'+esc(x.artist)+' · mesa '+x.mesa+' · '+esc(x.singer)+'</div></div><button class="btn ghost sm" data-a="rm" data-id="'+x.id+'">Quitar</button></div>').join(''):'<p class="mut small">No hay pedidos en espera.</p>')+'</div><button class="btn ghost sm" data-a="clean">Limpiar historial</button>'}},
  cat:{mount(){sig='';$('#pb').innerHTML='<div class="card stack"><h3 style="font-size:16px">Agregar canción</h3><input id="t" placeholder="Título"><input id="a" placeholder="Intérprete"><input id="v" placeholder="Enlace de YouTube (opcional)"><div class="row"><select id="l1" aria-label="Idioma">'+opts(LANGS,'es')+'</select><select id="v1" aria-label="Voz">'+opts(VOCES,'','Voz sin definir')+'</select></div><div class="row"><button class="btn" id="add">Agregar</button><button class="btn ghost" id="demo">Cargar los 20 temas</button><button class="btn ghost" id="vf">Verificar videos</button></div></div><div class="card" id="sl" style="margin-top:12px"></div>';
@@ -523,10 +535,10 @@ function panel(){const A=$('#app');
    '<label class="row"><input type="checkbox" id="s4" style="width:auto"'+(c.premium?' checked':'')+'> Activar versión premium (prioridad pagada)</label><label>Precio de la prioridad (Bs)<input id="s5" type="number" min="0" value="'+esc(c.price)+'"></label>'+
    '<label class="row"><input type="checkbox" id="s6" style="width:auto"'+(c.auto?' checked':'')+'> Pasar al siguiente cuando termine el video</label>'+
    '<label class="row"><input type="checkbox" id="s12" style="width:auto"'+(c.fsAuto?' checked':'')+'> Poner el video en pantalla completa después de presentar al cantante</label>'+
-   '<label class="row"><input type="checkbox" id="s8" style="width:auto"'+(c.cam?' checked':'')+'> Mostrar la cámara del cantante en la pantalla</label><label>Posición de la cámara<select id="s9">'+[['br','Abajo derecha'],['bl','Abajo izquierda'],['tr','Arriba derecha'],['tl','Arriba izquierda']].map(o=>'<option value="'+o[0]+'"'+(c.camPos===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select></label>'+
+   '<label class="row"><input type="checkbox" id="s8" style="width:auto"'+(c.cam?' checked':'')+'> Mostrar la cámara del cantante en la pantalla</label>'+camBlock(c)+
    '<label class="row"><input type="checkbox" id="s11" style="width:auto"'+(c.ytClient!==false?' checked':'')+'> Permitir que los clientes busquen karaokes en YouTube</label><label>Clave de YouTube Data API<input id="s10" value="'+esc(c.ytKey)+'" placeholder="AIza…" autocomplete="off"></label><p class="small mut" style="margin:0">Sirve para buscar karaokes nuevos. La pestaña Guía explica cómo crearla. Restríngela a tu dominio en Google Cloud, porque los clientes la usan desde su celular.</p>'+
    '<label>Búsquedas de YouTube por celular y por hora (0 = sin límite)<input id="s13" type="number" min="0" value="'+esc(c.ytLim)+'"></label><label>PIN del panel<input id="s7" value="'+esc(c.pin)+'"></label><button class="btn" id="sv">Guardar ajustes</button></div>';
-   $('#sv').onclick=()=>{const b=$('#sv');b.disabled=true;Promise.resolve(store.set('cfg','main',{bar:$('#s1').value.trim()||DEF.bar,max:+$('#s2').value||3,mesas:+$('#s3').value||12,premium:$('#s4').checked,price:+$('#s5').value||0,auto:$('#s6').checked,fsAuto:$('#s12').checked,cam:$('#s8').checked,camPos:$('#s9').value,ytClient:$('#s11').checked,ytKey:$('#s10').value.trim(),ytLim:(l=>isNaN(l)?5:Math.max(0,l))(parseInt($('#s13').value)),pin:$('#s7').value.trim()||'1234'})).then(ok=>{b.disabled=false;if(ok!==false)toast('✓ Ajustes guardados')})}},upd(){}},
+   camWire();$('#sv').onclick=()=>{const b=$('#sv');b.disabled=true;Promise.resolve(store.set('cfg','main',{bar:$('#s1').value.trim()||DEF.bar,max:+$('#s2').value||3,mesas:+$('#s3').value||12,premium:$('#s4').checked,price:+$('#s5').value||0,auto:$('#s6').checked,fsAuto:$('#s12').checked,cam:$('#s8').checked,camPos:'br',camX:+$('#cx').value,camY:+$('#cy').value,camSize:+$('#cs').value,camShape:$('#csh').value,ytClient:$('#s11').checked,ytKey:$('#s10').value.trim(),ytLim:(l=>isNaN(l)?5:Math.max(0,l))(parseInt($('#s13').value)),pin:$('#s7').value.trim()||'1234'})).then(ok=>{b.disabled=false;if(ok!==false)toast('✓ Ajustes guardados')})}},upd(){}},
  gd:{mount(){$('#pb').innerHTML=guiaOperador()},upd(){}}};
 
  function show(){cur=tabs[tab];[...$('#tb').children].forEach(b=>b.classList.toggle('on',b.dataset.t===tab));cur.mount();cur.upd()}
@@ -544,7 +556,7 @@ function netWatch(){if(window._nw)return;window._nw=1;
  addEventListener('offline',()=>set(true));addEventListener('online',ping);setInterval(ping,10000);ping()}
 
 /* ---------- ruteo e inicio ---------- */
-function route(){window.onmessage=null;
+function route(){window.onmessage=null;if(PAGE==='cliente')document.title='Rockola · Pide tu canción';
  if(PAGE==='pantalla')pantalla();else if(PAGE==='panel')panel();else if(PAGE==='cliente'){const m=parseInt(new URLSearchParams(location.search).get('mesa'));m>0?mesa(m):pickMesa()}else home();netWatch()}
 function attach(st){store=st;['songs','queue','cfg','claps'].forEach(n=>st.sub(n,r=>{if(store!==st)return;S[n]=r;(S._l=S._l||{})[n]=1;try{view.upd()}catch(e){console.error(e)}}))}
 async function init(){
